@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { HandleUnauthorizedOrForbiddenError } from "../../../../components/Errors/ErrorHandlers";
-import { JsonFetch } from "../../../../components/fetches/Fetches";
-import Loader from "../../../../components/loader/Loader";
-import Modal from "../../../../components/Messages/Modal";
-import { settings } from "../../../../settings";
+import { HandleUnauthorizedOrForbiddenError } from "../../../components/Errors/ErrorHandlers";
+import { JsonFetch } from "../../../components/fetches/Fetches";
+import Loader from "../../../components/loader/Loader";
+import { Modal } from "../../../components/Messages/Modal";
+import { settings } from "../../../settings";
 import SaveProduct from "../SaveProduct/SaveProduct";
 
 const deleteProduct = async (

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { HandleUnauthorizedOrForbiddenError } from "../../../../components/Errors/ErrorHandlers";
-import { JsonFetch } from "../../../../components/fetches/Fetches";
-import Loader from "../../../../components/loader/Loader";
-import Modal from "../../../../components/Messages/Modal";
-import { settings } from "../../../../settings";
+import { HandleUnauthorizedOrForbiddenError } from "../../../components/Errors/ErrorHandlers";
+import { JsonFetch } from "../../../components/fetches/Fetches";
+import Loader from "../../../components/loader/Loader";
+import { Modal } from "../../../components/Messages/Modal";
+import { settings } from "../../../settings";
 
 const getTypes = async (setIsLoading, setTypes, history, setSelectedType) => {
   try {

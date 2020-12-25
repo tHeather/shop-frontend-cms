@@ -3,11 +3,11 @@ import { Route, Switch, Redirect } from "react-router";
 import Login from "../../pages/Login/Login";
 import { AuthContext } from "../auth/AuthContext";
 import ServerError from "../../pages/ErrorPages/ServerError";
-import ProductList from "../../pages/Admin/Products/ProductList/ProductList";
-import CategoryList from "../../pages/Admin/MenuSettings/CategoryList/CategoryList";
-import SectionList from "../../pages/Admin/Sections/SectionList/SectionList";
-import SaveSection from "../../pages/Admin/Sections/SaveSection/SaveSection";
-import SaveProduct from "../../pages/Admin/Products/SaveProduct/SaveProduct";
+import ProductList from "../../pages/Products/ProductList/ProductList";
+import CategoryList from "../../pages/MenuSettings/CategoryList/CategoryList";
+import SectionList from "../../pages/Sections/SectionList/SectionList";
+import SaveSection from "../../pages/Sections/SaveSection/SaveSection";
+import SaveProduct from "../../pages/Products/SaveProduct/SaveProduct";
 
 const PrivateRoute = ({ userEmail, children }) => {
   return userEmail ? children : <Redirect exact to="/" />;
@@ -23,7 +23,7 @@ export default function Routing() {
       {/* Private */}
       <Route exact path="/orders">
         <PrivateRoute userEmail={userEmail}>
-          <div>Orders (Admin)</div>
+          <div>Orders )</div>
         </PrivateRoute>
       </Route>
       <Route exact path="/sections">

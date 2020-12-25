@@ -2,12 +2,9 @@ import { act, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import userEvent from "@testing-library/user-event";
 import ProductList, { AdminSortSelect, AdminFilters } from "./ProductList";
-import {
-  filterType,
-  sortType,
-} from "../../../../components/constants/constants";
-import { JsonFetch } from "../../../../components/fetches/Fetches";
-import { settings } from "../../../../settings";
+import { filterType, sortType } from "../../../components/constants/constants";
+import { JsonFetch } from "../../../components/fetches/Fetches";
+import { settings } from "../../../settings";
 import { MemoryRouter, Route } from "react-router";
 
 jest.mock("../../../../components/fetches/Fetches");

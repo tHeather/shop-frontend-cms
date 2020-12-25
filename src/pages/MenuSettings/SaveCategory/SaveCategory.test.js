@@ -7,8 +7,8 @@ import SaveCategory, {
   SelectType,
   TypeList,
 } from "./SaveCategory";
-import { JsonFetch } from "../../../../components/fetches/Fetches";
-import { settings } from "../../../../settings";
+import { JsonFetch } from "../../../components/fetches/Fetches";
+import { settings } from "../../../settings";
 import { MemoryRouter, Route } from "react-router";
 jest.mock("./../../../../components/fetches/Fetches");
 

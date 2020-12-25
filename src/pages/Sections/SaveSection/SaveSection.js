@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { HandleUnauthorizedOrForbiddenError } from "../../../../components/Errors/ErrorHandlers";
-import { JsonFetch } from "../../../../components/fetches/Fetches";
-import Loader from "../../../../components/loader/Loader";
-import Modal from "../../../../components/Messages/Modal";
-import { DisplayImage } from "../../../../components/Utils/ImageUtils/ImageUtils";
-import { DisplayItemList } from "../../../../components/Utils/ListUtils/ListUtils";
-import { settings } from "../../../../settings";
+import { HandleUnauthorizedOrForbiddenError } from "../../../components/Errors/ErrorHandlers";
+import { JsonFetch } from "../../../components/fetches/Fetches";
+import Loader from "../../../components/loader/Loader";
+import { Modal } from "../../../components/Messages/Modal";
+import { DisplayImage } from "../../../components/Utils/ImageUtils/ImageUtils";
+import { DisplayItemList } from "../../../components/Utils/ListUtils/ListUtils";
+import { settings } from "../../../settings";
 
 const getProducts = async (search, setIsLoading, setProducts, history) => {
   try {

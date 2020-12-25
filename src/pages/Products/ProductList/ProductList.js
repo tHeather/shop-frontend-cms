@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import {
-  filterType,
-  sortType,
-} from "../../../../components/constants/constants";
-import { JsonFetch } from "../../../../components/fetches/Fetches";
-import Loader from "../../../../components/loader/Loader";
-import { DisplayImage } from "../../../../components/Utils/ImageUtils/ImageUtils";
-import { DisplayItemList } from "../../../../components/Utils/ListUtils/ListUtils";
-import { MakeQueryString } from "../../../../components/Utils/QueryStringUtils/QueryStringUtils";
-import { settings } from "../../../../settings";
+import { filterType, sortType } from "../../../components/constants/constants";
+import { JsonFetch } from "../../../components/fetches/Fetches";
+import Loader from "../../../components/loader/Loader";
+import { DisplayImage } from "../../../components/Utils/ImageUtils/ImageUtils";
+import { DisplayItemList } from "../../../components/Utils/ListUtils/ListUtils";
+import { MakeQueryString } from "../../../components/Utils/QueryStringUtils/QueryStringUtils";
+import { settings } from "../../../settings";
 import EditProduct from "../EditProduct/EditProduct";
 
 const getProducts = async (

@@ -1,11 +1,11 @@
 import { Form, Formik } from "formik";
 import { object } from "yup";
 import React, { useEffect, useState } from "react";
-import ErrorModal from "../../../../components/Errors/ErrorModal";
+import ErrorModal from "../../../components/Errors/ErrorModal";
 import {
   StandardField,
   TextArea,
-} from "../../../../components/forms/fields/Fields";
+} from "../../../components/forms/fields/Fields";
 import {
   productNameConstraints,
   productTypeConstraints,
@@ -13,24 +13,21 @@ import {
   productQuantityConstraints,
   productPriceConstraints,
   productDiscountPriceConstraints,
-} from "../../../../components/forms/fieldsConstraints/FieldsConstraints";
-import Loader from "../../../../components/loader/Loader";
+} from "../../../components/forms/fieldsConstraints/FieldsConstraints";
+import Loader from "../../../components/loader/Loader";
 import { boolean } from "yup";
-import {
-  JsonFetch,
-  FormDataFetch,
-} from "../../../../components/fetches/Fetches";
-import { settings } from "../../../../settings";
+import { JsonFetch, FormDataFetch } from "../../../components/fetches/Fetches";
+import { settings } from "../../../settings";
 import {
   HandleErrorMessage,
   HandleUnauthorizedOrForbiddenError,
-} from "../../../../components/Errors/ErrorHandlers";
-import Modal from "../../../../components/Messages/Modal";
+} from "../../../components/Errors/ErrorHandlers";
+import { InfoModal } from "../../../components/Messages/Modal";
 import { useHistory } from "react-router-dom";
-import { FileUploadField } from "../../../../components/forms/fields/Fields";
-import { DisplayImage } from "../../../../components/Utils/ImageUtils/ImageUtils";
-import { fileValidation } from "../../../../components/forms/fieldsConstraints/FieldsConstraints";
-import { MakeFormData } from "../../../../components/Utils/formDataUtils/FormDataUtils";
+import { FileUploadField } from "../../../components/forms/fields/Fields";
+import { DisplayImage } from "../../../components/Utils/ImageUtils/ImageUtils";
+import { fileValidation } from "../../../components/forms/fieldsConstraints/FieldsConstraints";
+import { MakeFormData } from "../../../components/Utils/formDataUtils/FormDataUtils";
 
 const updateProduct = async (
   formValues,
@@ -38,8 +35,8 @@ const updateProduct = async (
   setFormValues,
   setSavedImages,
   setErrorsList,
-  setIsSaved,
-  setisNotFund,
+  setIsProductSaved,
+  setIsProductNotFund,
   productId,
   history
 ) => {
@@ -65,7 +62,7 @@ const updateProduct = async (
     switch (response.status) {
       case 200:
         const { firstImage, secondImage, thirdImage } = await response.json();
-        setIsSaved(true);
+        setIsProductSaved(true);
         setFormValues(productWithEmptyPohots);
         setSavedImages({ firstImage, secondImage, thirdImage });
         setIsLoading(false);
@@ -79,7 +76,7 @@ const updateProduct = async (
         HandleUnauthorizedOrForbiddenError(history);
         break;
       case 404:
-        setisNotFund(true);
+        setIsProductNotFund(true);
         setIsLoading(false);
         break;
       case 500:
@@ -98,7 +95,7 @@ const saveProduct = async (
   formValues,
   setIsLoading,
   setFormValues,
-  setIsSaved,
+  setIsProductSaved,
   setErrorsList,
   history
 ) => {
@@ -122,7 +119,7 @@ const saveProduct = async (
 
     switch (response.status) {
       case 201:
-        setIsSaved(true);
+        setIsProductSaved(true);
         setIsLoading(false);
         setFormValues(initialFormValues);
         break;
@@ -156,7 +153,7 @@ const getProduct = async (
   setFormValues,
   setSavedImages,
   setIsLoading,
-  setisNotFund,
+  setIsProductNotFund,
   history
 ) => {
   try {
@@ -189,8 +186,55 @@ const getProduct = async (
         setIsLoading(false);
         break;
       case 404:
-        setisNotFund(true);
+        setIsProductNotFund(true);
         setIsLoading(false);
+        break;
+      case 500:
+        history.push("/500");
+        break;
+      default:
+        console.log(response);
+        break;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const deleteImage = async (
+  imageName,
+  productId,
+  setSavedImages,
+  setIsImageDeleted,
+  setIsImageNotFund,
+  setIsLoading,
+  history
+) => {
+  try {
+    setIsLoading(true);
+
+    const response = await FormDataFetch(
+      `${settings.baseURL}/api/Product/${productId}/${imageName}`,
+      "DELETE",
+      true,
+      null
+    );
+
+    switch (response.status) {
+      case 201:
+        setIsImageDeleted(true);
+        setSavedImages((prev) => {
+          return { ...prev, [imageName]: null };
+        });
+        setIsLoading(false);
+        break;
+      case 404:
+        setIsImageNotFund(true);
+        setIsLoading(false);
+        break;
+      case 401:
+      case 403:
+        HandleUnauthorizedOrForbiddenError(history);
         break;
       case 500:
         history.push("/500");
@@ -231,25 +275,15 @@ const initialFormValues = {
   thirdImage: "",
 };
 
-const SuccessModal = ({ setIsSaved }) => {
-  return (
-    <Modal>
-      <p>Product data successfully saved.</p>
-      <button onClick={() => setIsSaved(false)}>OK</button>
-    </Modal>
-  );
-};
-
-const NotFoundModal = ({ setSelectedProductId }) => {
-  return (
-    <Modal>
-      <p>Product not found.</p>
-      <button onClick={() => setSelectedProductId(null)}>Back to list</button>
-    </Modal>
-  );
-};
-
-const SavedImages = ({ images }) => {
+const SavedImages = ({
+  images,
+  productId,
+  setSavedImages,
+  setIsImageDeleted,
+  setIsImageNotFund,
+  setIsLoading,
+  history,
+}) => {
   if (!images) return null;
 
   const { firstImage, secondImage, thirdImage } = images;
@@ -258,10 +292,55 @@ const SavedImages = ({ images }) => {
       <div>Current(saved) product images</div>
       <div>First image</div>
       <DisplayImage src={firstImage} />
+      <button
+        onClick={() =>
+          deleteImage(
+            firstImage,
+            productId,
+            setSavedImages,
+            setIsImageDeleted,
+            setIsImageNotFund,
+            setIsLoading,
+            history
+          )
+        }
+      >
+        Delete
+      </button>
       <div>Second image</div>
       <DisplayImage src={secondImage} />
+      <button
+        onClick={() =>
+          deleteImage(
+            secondImage,
+            productId,
+            setSavedImages,
+            setIsImageDeleted,
+            setIsImageNotFund,
+            setIsLoading,
+            history
+          )
+        }
+      >
+        Delete
+      </button>
       <div>Third image</div>
       <DisplayImage src={thirdImage} />
+      <button
+        onClick={() =>
+          deleteImage(
+            thirdImage,
+            productId,
+            setSavedImages,
+            setIsImageDeleted,
+            setIsImageNotFund,
+            setIsLoading,
+            history
+          )
+        }
+      >
+        Delete
+      </button>
     </>
   );
 };
@@ -270,8 +349,11 @@ export default function SaveProduct({ productId = "", setSelectedProductId }) {
   const [formValues, setFormValues] = useState(initialFormValues);
   const [savedImages, setSavedImages] = useState(null);
 
-  const [isSaved, setIsSaved] = useState(false);
-  const [isNotFund, setisNotFund] = useState(false);
+  const [isImageDeleted, setIsImageDeleted] = useState(false);
+  const [isImageNotFund, setIsImageNotFund] = useState(false);
+
+  const [isProductSaved, setIsProductSaved] = useState(false);
+  const [isProductNotFund, setIsProductNotFund] = useState(false);
 
   const [errorsList, setErrorsList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -284,14 +366,42 @@ export default function SaveProduct({ productId = "", setSelectedProductId }) {
       setFormValues,
       setSavedImages,
       setIsLoading,
-      setisNotFund,
+      setIsProductNotFund,
       history
     );
   }, []);
 
-  if (isNotFund)
-    return <NotFoundModal setSelectedProductId={setSelectedProductId} />;
-  if (isSaved) return <SuccessModal setIsSaved={setIsSaved} />;
+  if (isProductNotFund)
+    return (
+      <InfoModal
+        closeHandler={() => setSelectedProductId(null)}
+        btnText="Back to list"
+      >
+        <p>Product not found.</p>
+      </InfoModal>
+    );
+
+  if (isProductSaved)
+    return (
+      <InfoModal closeHandler={() => setIsProductSaved(false)} btnText="OK">
+        <p>Product data successfully saved.</p>
+      </InfoModal>
+    );
+
+  if (isImageNotFund)
+    return (
+      <InfoModal closeHandler={() => setIsImageNotFund(false)} btnText="OK">
+        <p>Image not found.</p>
+      </InfoModal>
+    );
+
+  if (isImageDeleted)
+    return (
+      <InfoModal closeHandler={() => setIsImageDeleted(false)} btnText="OK">
+        <p>Image successfully deleted.</p>
+      </InfoModal>
+    );
+
   if (isLoading) return <Loader />;
 
   return (
@@ -310,8 +420,8 @@ export default function SaveProduct({ productId = "", setSelectedProductId }) {
                 setFormValues,
                 setSavedImages,
                 setErrorsList,
-                setIsSaved,
-                setisNotFund,
+                setIsProductSaved,
+                setIsProductNotFund,
                 productId,
                 history
               )
@@ -319,7 +429,7 @@ export default function SaveProduct({ productId = "", setSelectedProductId }) {
                 values,
                 setIsLoading,
                 setFormValues,
-                setIsSaved,
+                setIsProductSaved,
                 setErrorsList,
                 history
               )
@@ -350,7 +460,15 @@ export default function SaveProduct({ productId = "", setSelectedProductId }) {
               hidden={!isOnDiscount}
             />
 
-            <SavedImages images={savedImages} />
+            <SavedImages
+              images={savedImages}
+              productId={productId}
+              setSavedImages={setSavedImages}
+              setIsImageDeleted={setIsImageDeleted}
+              setIsImageNotFund={setIsImageNotFund}
+              setIsLoading={setIsLoading}
+              history={history}
+            />
 
             <FileUploadField
               name="firstImage"
