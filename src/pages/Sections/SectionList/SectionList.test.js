@@ -3,10 +3,10 @@ import "@testing-library/jest-dom/extend-expect";
 import userEvent from "@testing-library/user-event";
 import SectionList, { DisplaySections } from "./SectionList";
 import { MemoryRouter, Route } from "react-router";
-import { JsonFetch } from "../../../../components/fetches/Fetches";
-import { settings } from "../../../../settings";
+import { JsonFetch } from "../../../components/fetches/Fetches";
+import { settings } from "../../../settings";
 
-jest.mock("../../../../components/fetches/Fetches");
+jest.mock("../../../components/fetches/Fetches");
 
 describe("DisplaySections: with sections to dispaly", () => {
   const mockedsetSelectedSectionId = jest.fn();

@@ -8,11 +8,11 @@ import {
 import "@testing-library/jest-dom/extend-expect";
 import userEvent from "@testing-library/user-event";
 import SaveSection from "./SaveSection";
-import { JsonFetch } from "../../../../components/fetches/Fetches";
-import { settings } from "../../../../settings";
+import { JsonFetch } from "../../../components/fetches/Fetches";
+import { settings } from "../../../settings";
 import { MemoryRouter, Route } from "react-router";
 
-jest.mock("../../../../components/fetches/Fetches");
+jest.mock("../../../components/fetches/Fetches");
 
 describe("SaveSection: Save mode", () => {
   test("render component correctly", () => {
@@ -48,7 +48,7 @@ describe("SaveSection: Save mode", () => {
               price: 10000,
               isOnDiscount: true,
               discountPrice: 9500,
-              mainImage: "imageMacbook.jpg",
+              firstImage: "imageMacbook.jpg",
             },
           ]),
       });
@@ -185,7 +185,7 @@ describe("GetProducts (GET)", () => {
             price: 10000,
             isOnDiscount: true,
             discountPrice: 9500,
-            mainImage: "imageMacbook.jpg",
+            firstImage: "imageMacbook.jpg",
           },
         ]),
     });
@@ -194,7 +194,9 @@ describe("GetProducts (GET)", () => {
       "Mackbook {enter}"
     );
     const image = await screen.findByAltText("Mackbook");
-    expect(image.getAttribute("src")).toBe("imageMacbook.jpg");
+    expect(image.getAttribute("src")).toBe(
+      `${settings.baseURL}/imageMacbook.jpg`
+    );
     expect(await screen.findByText("Mackbook")).toBeInTheDocument();
     expect(await screen.findByText("10000")).toBeInTheDocument();
     expect(await screen.findByText("9500")).toBeInTheDocument();
@@ -230,7 +232,7 @@ describe("SaveProduct: update mode", () => {
               price: 10000,
               isOnDiscount: true,
               discountPrice: 9500,
-              mainImage: "imageMacbook.jpg",
+              firstImage: "imageMacbook.jpg",
             },
             {
               id: "3",
@@ -239,7 +241,7 @@ describe("SaveProduct: update mode", () => {
               price: 2000,
               isOnDiscount: true,
               discountPrice: 1500,
-              mainImage: "ASUS.jpg",
+              firstImage: "ASUS.jpg",
             },
           ],
         }),
@@ -286,7 +288,9 @@ describe("SaveProduct: update mode", () => {
     expect(JsonFetch.mock.calls).toHaveLength(1);
 
     const image = await screen.findByAltText("Mackbook");
-    expect(image.getAttribute("src")).toBe("imageMacbook.jpg");
+    expect(image.getAttribute("src")).toBe(
+      `${settings.baseURL}/imageMacbook.jpg`
+    );
     expect(await screen.findByText("Mackbook")).toBeInTheDocument();
     expect(await screen.findByText("10000")).toBeInTheDocument();
     expect(await screen.findByText("9500")).toBeInTheDocument();
@@ -336,7 +340,7 @@ describe("SaveProduct: update mode", () => {
               price: 5000,
               isOnDiscount: true,
               discountPrice: 4500,
-              mainImage: "Hp.jpg",
+              firstImage: "Hp.jpg",
             },
           ]),
       }).mockReturnValueOnce({

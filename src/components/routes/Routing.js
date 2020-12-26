@@ -23,7 +23,7 @@ export default function Routing() {
       {/* Private */}
       <Route exact path="/orders">
         <PrivateRoute userEmail={userEmail}>
-          <div>Orders )</div>
+          <div>Orders</div>
         </PrivateRoute>
       </Route>
       <Route exact path="/sections">

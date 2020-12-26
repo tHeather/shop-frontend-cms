@@ -1,162 +1,122 @@
 import { act, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { AuthContext } from "../auth/AuthContext";
-import Navigation, { AccountNav, CustomerNav } from "./Navigation";
-import { BrowserRouter } from "react-router-dom";
-import { userType } from "../constants/constants";
+import Navigation, { Collapse, DisplayLinks } from "./Navigation";
+import { MemoryRouter } from "react-router-dom";
+import userEvent from "@testing-library/user-event";
 
-test("Navigation: renders correcty (admin)", () => {
+describe("Collapse", () => {
+  beforeEach(() => {
+    act(() => {
+      render(
+        <Collapse btnText="Test text">Some text inside container.</Collapse>
+      );
+    });
+  });
+
+  test("renders correctly", () => {
+    expect(screen.getByRole("button").textContent).toBe("Test text");
+    expect(screen.getByText("Some text inside container.")).toBeInTheDocument();
+  });
+
+  test("toggle opening state", () => {
+    const button = screen.getByRole("button");
+    const container = screen.getByText("Some text inside container.");
+
+    const stylesBefore = window.getComputedStyle(container);
+    expect(stylesBefore.getPropertyValue("transform")).toBe("scaleY(0)");
+
+    act(() => {
+      userEvent.click(button);
+    });
+
+    const stylesAfter = window.getComputedStyle(container);
+    expect(stylesAfter.getPropertyValue("transform")).toBe("scaleY(1)");
+
+    act(() => {
+      userEvent.click(button);
+    });
+
+    const stylesFinal = window.getComputedStyle(container);
+    expect(stylesFinal.getPropertyValue("transform")).toBe("scaleY(0)");
+  });
+});
+
+describe("DisplayLinks", () => {
+  const links = [
+    { label: "Test label 1", url: "/test1" },
+    { label: "Test label 2", url: "/test2" },
+  ];
+
+  test("with no likns", () => {
+    expect(DisplayLinks({ links: null })).toBe(null);
+  });
+
+  test("render links correctly", () => {
+    act(() => {
+      render(
+        <MemoryRouter>
+          <DisplayLinks links={links} />
+        </MemoryRouter>
+      );
+    });
+    const linksArr = screen.getAllByRole("link");
+    expect(linksArr.length).toBe(2);
+    expect(linksArr[0].getAttribute("href")).toBe("/test1");
+    expect(linksArr[1].getAttribute("href")).toBe("/test2");
+    expect(linksArr[0].textContent).toBe("Test label 1");
+    expect(linksArr[1].textContent).toBe("Test label 2");
+  });
+});
+
+test("Navigation: render component correctly", () => {
   act(() => {
     render(
       <AuthContext.Provider
         value={{
-          role: userType.admin,
-          email: "admin@test.pl",
+          userEmail: "admin@test.pl",
           login: jest.fn(),
           logout: jest.fn(),
         }}
       >
-        <BrowserRouter>
+        <MemoryRouter>
           <Navigation />
-        </BrowserRouter>
+        </MemoryRouter>
       </AuthContext.Provider>
     );
   });
+
   expect(screen.getByText("Products")).toBeInTheDocument();
   expect(screen.getByText("Add product")).toBeInTheDocument();
   expect(screen.getByText("Product list")).toBeInTheDocument();
+  expect(screen.getByText("Visual settings")).toBeInTheDocument();
+  expect(screen.getByText("Menu")).toBeInTheDocument();
+  expect(screen.getByText("Current sections")).toBeInTheDocument();
+  expect(screen.getByText("Add Section")).toBeInTheDocument();
+
   expect(screen.getByText("Logout")).toBeInTheDocument();
+  const changePasswordLink = screen.getByText("Change password");
+  expect(changePasswordLink).toBeInTheDocument();
+  expect(changePasswordLink.getAttribute("href")).toBe("/change-password");
   expect(screen.getByText("admin@test.pl")).toBeInTheDocument();
 });
 
-test("Navigation: renders correctly (loggedInCustomer)", () => {
+test("Navigation: return null if user is not logged in", () => {
   act(() => {
     render(
       <AuthContext.Provider
         value={{
-          role: userType.loggedInCustomer,
-          email: "loggedInCustomer@test.pl",
+          userEmail: "",
           login: jest.fn(),
           logout: jest.fn(),
         }}
       >
-        <BrowserRouter>
+        <MemoryRouter>
           <Navigation />
-        </BrowserRouter>
+        </MemoryRouter>
       </AuthContext.Provider>
     );
   });
-  const links = screen.getAllByRole("link");
-  expect(links[0].getAttribute("href")).toBe("/");
-  expect(links[1].getAttribute("href")).toBe("/cart");
-  expect(screen.queryByText("Sign in")).not.toBeInTheDocument();
-  expect(screen.getByText("Logout")).toBeInTheDocument();
-  expect(screen.getByText("loggedInCustomer@test.pl")).toBeInTheDocument();
-});
 
-test("Navigation: renders correctly (guest)", () => {
-  act(() => {
-    render(
-      <AuthContext.Provider
-        value={{
-          role: userType.guest,
-          email: "",
-          login: jest.fn(),
-          logout: jest.fn(),
-        }}
-      >
-        <BrowserRouter>
-          <Navigation />
-        </BrowserRouter>
-      </AuthContext.Provider>
-    );
-  });
-  const links = screen.getAllByRole("link");
-  expect(links[0].getAttribute("href")).toBe("/");
-  expect(links[1].getAttribute("href")).toBe("/cart");
-  expect(links[2].getAttribute("href")).toBe("/login");
-  expect(links[2].textContent).toBe("Sign in");
-  expect(links[3].getAttribute("href")).toBe("/registration");
-  expect(links[3].textContent).toBe("Sign up");
   expect(screen.queryByText("Logout")).not.toBeInTheDocument();
-});
-
-test("AccountNav: renders correctly (admin)", () => {
-  act(() => {
-    render(
-      <BrowserRouter>
-        <AccountNav
-          role={userType.admin}
-          email="admin@test.pl"
-          logout={jest.fn()}
-        />
-      </BrowserRouter>
-    );
-  });
-  const changePasswordLink = screen.getByRole("link");
-  expect(changePasswordLink.getAttribute("href")).toBe(
-    "/admin/change-password"
-  );
-  expect(changePasswordLink.textContent).toBe("Change password");
-  expect(screen.getByText("Logout")).toBeInTheDocument();
-  expect(screen.getByText("admin@test.pl")).toBeInTheDocument();
-});
-
-test("AccountNav: renders correctly (customer)", () => {
-  act(() => {
-    render(
-      <BrowserRouter>
-        <AccountNav
-          role={userType.loggedInCustomer}
-          email="customer@test.pl"
-          logout={jest.fn()}
-        />
-      </BrowserRouter>
-    );
-  });
-  const links = screen.getAllByRole("link");
-  expect(links[0].getAttribute("href")).toBe("/change-data");
-  expect(links[0].textContent).toBe("Change data");
-  expect(links[1].getAttribute("href")).toBe("/orders");
-  expect(links[1].textContent).toBe("My orders");
-  expect(screen.getByText("Logout")).toBeInTheDocument();
-  expect(screen.getByText("customer@test.pl")).toBeInTheDocument();
-});
-
-test("CustomerNav: renders correctly (guest)", () => {
-  act(() => {
-    render(
-      <BrowserRouter>
-        <CustomerNav role={userType.guest} />
-      </BrowserRouter>
-    );
-  });
-  const links = screen.getAllByRole("link");
-  expect(links[0].getAttribute("href")).toBe("/");
-  expect(links[1].getAttribute("href")).toBe("/cart");
-  expect(links[2].getAttribute("href")).toBe("/login");
-  expect(links[2].textContent).toBe("Sign in");
-  expect(links[3].getAttribute("href")).toBe("/registration");
-  expect(links[3].textContent).toBe("Sign up");
-  expect(screen.queryByText("Logout")).not.toBeInTheDocument();
-});
-
-test("CustomerNav: renders correctly (loggedInCustomer)", () => {
-  act(() => {
-    render(
-      <BrowserRouter>
-        <CustomerNav
-          role={userType.loggedInCustomer}
-          email="loggedInCustomer@test.pl"
-          logout={jest.fn()}
-        />
-      </BrowserRouter>
-    );
-  });
-  const links = screen.getAllByRole("link");
-  expect(links[0].getAttribute("href")).toBe("/");
-  expect(links[1].getAttribute("href")).toBe("/cart");
-  expect(screen.queryByText("Sign in")).not.toBeInTheDocument();
-  expect(screen.getByText("Logout")).toBeInTheDocument();
-  expect(screen.getByText("loggedInCustomer@test.pl")).toBeInTheDocument();
 });

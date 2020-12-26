@@ -7,20 +7,20 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     const email = sessionStorage.getItem("email");
-    if (email) return;
+    if (!email) return;
     setUserEmail(email);
   }, []);
 
   const login = ({ token, email }) => {
-    setUserEmail(email);
     sessionStorage.setItem("email", email);
     sessionStorage.setItem("token", token);
+    setUserEmail(email);
   };
 
   const logout = () => {
-    setUserEmail("");
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("email");
+    setUserEmail("");
   };
 
   return (

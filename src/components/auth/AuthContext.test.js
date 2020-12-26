@@ -1,7 +1,8 @@
 import AuthProvider, { AuthContext } from "../../components/auth/AuthContext";
-import { act, render } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import React, { useState } from "react";
+import userEvent from "@testing-library/user-event";
 
 jest.mock("react", () => ({
   ...jest.requireActual("react"),
@@ -10,10 +11,10 @@ jest.mock("react", () => ({
 
 afterEach(() => {
   sessionStorage.removeItem("token");
-  sessionStorage.removeItem("sessionData");
+  sessionStorage.removeItem("email");
 });
 
-test("Set sessionData in session storage", async () => {
+test("set session data in session storage", async () => {
   const setState = jest.fn();
   useState.mockImplementation((init) => [init, setState]);
 
@@ -21,23 +22,56 @@ test("Set sessionData in session storage", async () => {
     render(
       <AuthProvider>
         <AuthContext.Consumer>
-          {({ login }) =>
-            login({ role: "admin", email: "admin@test.pl", token: "testToken" })
-          }
+          {({ login }) => (
+            <button
+              onClick={() =>
+                login({ email: "admin@test.pl", token: "testToken" })
+              }
+            >
+              Log in
+            </button>
+          )}
         </AuthContext.Consumer>
       </AuthProvider>
     );
   });
-  expect(sessionStorage.getItem("sessionData")).toBe(
-    JSON.stringify({ role: "admin", email: "admin@test.pl" })
-  );
+
+  userEvent.click(screen.getByText("Log in"));
+
+  expect(sessionStorage.getItem("email")).toBe("admin@test.pl");
+  expect(sessionStorage.getItem("token")).toBe("testToken");
 });
 
-test("Log in with data from session storage", async () => {
-  sessionStorage.setItem(
-    "sessionData",
-    JSON.stringify({ role: "admin", email: "admin@test.pl" })
-  );
+test("set state with user email", async () => {
+  const setState = jest.fn();
+  useState.mockImplementation((init) => [init, setState]);
+
+  act(() => {
+    render(
+      <AuthProvider>
+        <AuthContext.Consumer>
+          {({ login }) => (
+            <button
+              onClick={() =>
+                login({ email: "admin@test.pl", token: "testToken" })
+              }
+            >
+              Log in
+            </button>
+          )}
+        </AuthContext.Consumer>
+      </AuthProvider>
+    );
+  });
+
+  userEvent.click(screen.getByText("Log in"));
+
+  expect(setState.mock.calls).toHaveLength(1);
+  expect(setState.mock.calls[0][0]).toEqual("admin@test.pl");
+});
+
+test("log in with data from session storage", async () => {
+  sessionStorage.setItem("email", "admin@test.pl");
 
   const setState = jest.fn();
   useState.mockImplementation((state) => [state, setState]);
@@ -46,13 +80,10 @@ test("Log in with data from session storage", async () => {
     render(<AuthProvider />);
   });
   expect(setState.mock.calls).toHaveLength(1);
-  expect(setState.mock.calls[0][0]).toEqual({
-    role: "admin",
-    email: "admin@test.pl",
-  });
+  expect(setState.mock.calls[0][0]).toEqual("admin@test.pl");
 });
 
-test("attempt to log in with session storage data (with no data in session storage)", async () => {
+test("attempt to log in with session storage data (with empty session storage)", async () => {
   const setState = jest.fn();
   useState.mockImplementation((state) => [state, setState]);
 
@@ -62,49 +93,7 @@ test("attempt to log in with session storage data (with no data in session stora
   expect(setState.mock.calls).toHaveLength(0);
 });
 
-test("Set token in session storage", async () => {
-  const setState = jest.fn();
-  useState.mockImplementation((init) => [init, setState]);
-
-  act(() => {
-    render(
-      <AuthProvider>
-        <AuthContext.Consumer>
-          {({ login }) => login({ token: "testToken" })}
-        </AuthContext.Consumer>
-      </AuthProvider>
-    );
-  });
-  expect(sessionStorage.getItem("token")).toBe("testToken");
-});
-
-test.only("Set state with session data", async () => {
-  const setState = jest.fn();
-  useState.mockImplementation((init) => [init, setState]);
-
-  act(() => {
-    render(
-      <AuthProvider>
-        <AuthContext.Consumer>
-          {({ login }) =>
-            login({
-              role: "admin",
-              email: "admin@test.pl",
-              token: "testToken",
-            })
-          }
-        </AuthContext.Consumer>
-      </AuthProvider>
-    );
-  });
-  expect(setState.mock.calls.length).toBe(1);
-  expect(setState.mock.calls[0][0]).toEqual({
-    role: "admin",
-    email: "admin@test.pl",
-  });
-});
-
-test("Set state with initial data", async () => {
+test("Set state with initial data (logout)", async () => {
   const setState = jest.fn();
   useState.mockImplementation((init) => [init, setState]);
 
@@ -116,10 +105,7 @@ test("Set state with initial data", async () => {
     );
   });
   expect(setState.mock.calls.length).toBe(1);
-  expect(setState.mock.calls[0][0]).toEqual({
-    role: "guest",
-    email: "",
-  });
+  expect(setState.mock.calls[0][0]).toEqual("");
 });
 
 test("Remove token from session storage", async () => {

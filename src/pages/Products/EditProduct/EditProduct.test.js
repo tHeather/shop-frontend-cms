@@ -2,48 +2,45 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import userEvent from "@testing-library/user-event";
 import EditProduct from "./EditProduct";
-import { JsonFetch } from "../../../../components/fetches/Fetches";
-import { settings } from "../../../../settings";
+import { JsonFetch } from "../../../components/fetches/Fetches";
+import { settings } from "../../../settings";
 import { MemoryRouter, Route } from "react-router";
 
-jest.mock("../../../../components/fetches/Fetches");
+jest.mock("../../../components/fetches/Fetches");
 
 test("EditProduct: render component correctly", async () => {
-  JsonFetch.mockImplementation(() => {
-    return {
-      status: 200,
-      json: () =>
-        Promise.resolve({
-          id: 123,
-          name: "Mackbook",
-          type: "Laptop",
-          description: "Description of mackbook.",
-          manufacturer: "Apple",
-          quantity: 123,
-          price: 12345,
-          isOnDiscount: true,
-          discountPrice: 11950,
-          mainImage: "image1.jpg",
-          secondImage: "image2.jpg",
-          thirdImage: "image3.jpg",
-        }),
-    };
+  JsonFetch.mockReturnValueOnce({
+    status: 200,
+    json: () =>
+      Promise.resolve({
+        id: 123,
+        name: "Mackbook",
+        type: "Laptop",
+        description: "Description of mackbook.",
+        manufacturer: "Apple",
+        quantity: 123,
+        price: 12345,
+        isOnDiscount: true,
+        discountPrice: 11950,
+        firstImage: "image1.jpg",
+        secondImage: "image2.jpg",
+        thirdImage: "image3.jpg",
+      }),
   });
 
-  const mockedsetSelectedProduct = jest.fn();
+  const mockedsetSelectedProductId = jest.fn();
 
   act(() => {
     render(
       <EditProduct
         productId="123"
-        setSelectedProduct={mockedsetSelectedProduct}
+        setSelectedProductId={mockedsetSelectedProductId}
       />
     );
   });
 
   expect(JsonFetch.mock.calls.length).toBe(1);
 
-  expect(await screen.findByText("Back to list")).toBeInTheDocument();
   expect(await screen.findByText("Delete product")).toBeInTheDocument();
   expect(
     await screen.findByLabelText("Product name", { selector: "input" })
@@ -70,26 +67,28 @@ test("EditProduct: make GET request with correct parameters", async () => {
           price: 12345,
           isOnDiscount: true,
           discountPrice: 11950,
-          mainImage: "image1.jpg",
+          firstImage: "image1.jpg",
           secondImage: "image2.jpg",
           thirdImage: "image3.jpg",
         }),
     };
   });
 
-  const mockedsetSelectedProduct = jest.fn();
+  const mockedsetSelectedProductId = jest.fn();
 
   act(() => {
     render(
       <EditProduct
         productId="123"
-        setSelectedProduct={mockedsetSelectedProduct}
+        setSelectedProductId={mockedsetSelectedProductId}
       />
     );
   });
 
   expect(JsonFetch.mock.calls.length).toBe(1);
-  expect(JsonFetch.mock.calls[0][0]).toBe(`${settings.baseURL}/product/123`);
+  expect(JsonFetch.mock.calls[0][0]).toBe(
+    `${settings.baseURL}/api/Product/123`
+  );
   expect(JsonFetch.mock.calls[0][1]).toBe("GET");
   expect(JsonFetch.mock.calls[0][2]).toBe(false);
   expect(JsonFetch.mock.calls[0][3]).toBe(null);
@@ -118,20 +117,20 @@ test("EditProduct: handle server response (GET,status 200)", async () => {
           price: 12345,
           isOnDiscount: true,
           discountPrice: 11950,
-          mainImage: "image1.jpg",
+          firstImage: "image1.jpg",
           secondImage: "image2.jpg",
           thirdImage: "image3.jpg",
         }),
     };
   });
 
-  const mockedsetSelectedProduct = jest.fn();
+  const mockedsetSelectedProductId = jest.fn();
 
   act(() => {
     render(
       <EditProduct
         productId="123"
-        setSelectedProduct={mockedsetSelectedProduct}
+        setSelectedProductId={mockedsetSelectedProductId}
       />
     );
   });
@@ -141,8 +140,8 @@ test("EditProduct: handle server response (GET,status 200)", async () => {
   });
   expect(nameInput.value).toBe("Mackbook");
 
-  const mainImage = await screen.findAllByRole("img");
-  expect(mainImage[0].getAttribute("src")).toBe(
+  const firstImage = await screen.findAllByRole("img");
+  expect(firstImage[0].getAttribute("src")).toBe(
     `${settings.baseURL}/image1.jpg`
   );
 });
@@ -154,13 +153,13 @@ test("EditProduct: handle server response (GET,status 404)", async () => {
     };
   });
 
-  const mockedsetSelectedProduct = jest.fn();
+  const mockedsetSelectedProductId = jest.fn();
 
   act(() => {
     render(
       <EditProduct
         productId="123"
-        setSelectedProduct={mockedsetSelectedProduct}
+        setSelectedProductId={mockedsetSelectedProductId}
       />
     );
   });
@@ -168,8 +167,8 @@ test("EditProduct: handle server response (GET,status 404)", async () => {
   expect(await screen.findByText("Product not found.")).toBeInTheDocument();
 
   userEvent.click(await screen.findByText("Back to list"));
-  expect(mockedsetSelectedProduct.mock.calls.length).toBe(1);
-  expect(mockedsetSelectedProduct.mock.calls[0][0]).toBe(null);
+  expect(mockedsetSelectedProductId.mock.calls.length).toBe(1);
+  expect(mockedsetSelectedProductId.mock.calls[0][0]).toBe(null);
 });
 
 test("EditProduct: handle server response (GET,status 500)", async () => {
@@ -179,7 +178,7 @@ test("EditProduct: handle server response (GET,status 500)", async () => {
     };
   });
 
-  const mockedsetSelectedProduct = jest.fn();
+  const mockedsetSelectedProductId = jest.fn();
 
   act(() => {
     render(
@@ -191,7 +190,7 @@ test("EditProduct: handle server response (GET,status 500)", async () => {
             return (
               <EditProduct
                 productId="123"
-                setSelectedProduct={mockedsetSelectedProduct}
+                setSelectedProductId={mockedsetSelectedProductId}
               />
             );
           }}
@@ -205,7 +204,7 @@ test("EditProduct: handle server response (GET,status 500)", async () => {
 });
 
 describe("EditPorduct: Handle server response (DELETE)", () => {
-  const mockedsetSelectedProduct = jest.fn();
+  const mockedsetSelectedProductId = jest.fn();
 
   beforeEach(async () => {
     JsonFetch.mockImplementation(() => {
@@ -222,7 +221,7 @@ describe("EditPorduct: Handle server response (DELETE)", () => {
             price: 12345,
             isOnDiscount: true,
             discountPrice: 11950,
-            mainImage: "image1.jpg",
+            firstImage: "image1.jpg",
             secondImage: "image2.jpg",
             thirdImage: "image3.jpg",
           }),
@@ -239,7 +238,7 @@ describe("EditPorduct: Handle server response (DELETE)", () => {
               return (
                 <EditProduct
                   productId="123"
-                  setSelectedProduct={mockedsetSelectedProduct}
+                  setSelectedProductId={mockedsetSelectedProductId}
                 />
               );
             }}
@@ -273,8 +272,8 @@ describe("EditPorduct: Handle server response (DELETE)", () => {
     ).toBeInTheDocument();
 
     userEvent.click(await screen.findByText("Back to list"));
-    expect(mockedsetSelectedProduct.mock.calls.length).toBe(1);
-    expect(mockedsetSelectedProduct.mock.calls[0][0]).toBe(null);
+    expect(mockedsetSelectedProductId.mock.calls.length).toBe(1);
+    expect(mockedsetSelectedProductId.mock.calls[0][0]).toBe(null);
   });
 
   test("status 401", async () => {

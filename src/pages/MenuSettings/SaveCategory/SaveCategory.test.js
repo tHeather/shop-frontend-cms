@@ -10,7 +10,7 @@ import SaveCategory, {
 import { JsonFetch } from "../../../components/fetches/Fetches";
 import { settings } from "../../../settings";
 import { MemoryRouter, Route } from "react-router";
-jest.mock("./../../../../components/fetches/Fetches");
+jest.mock("../../../components/fetches/Fetches");
 
 test("addTypeToCategory", () => {
   const mockedSetCategoryTypes = jest.fn((fun) => fun(new Set()));

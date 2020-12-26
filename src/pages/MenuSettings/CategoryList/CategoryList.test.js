@@ -2,10 +2,10 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import userEvent from "@testing-library/user-event";
 import CategoryList, { DisplayCategories } from "./CategoryList";
-import { JsonFetch } from "../../../../components/fetches/Fetches";
+import { JsonFetch } from "../../../components/fetches/Fetches";
 import { MemoryRouter, Route } from "react-router";
-import { settings } from "../../../../settings";
-jest.mock("./../../../../components/fetches/Fetches");
+import { settings } from "../../../settings";
+jest.mock("../../../components/fetches/Fetches");
 
 describe("DisplayCategories: render component with following parameters:", () => {
   test("correct parameters", async () => {

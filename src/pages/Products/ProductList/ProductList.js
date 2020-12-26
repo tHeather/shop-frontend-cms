@@ -42,7 +42,7 @@ const getProducts = async (
   }
 };
 
-export const AdminProductSortSelect = ({ handleChange, defaultValue }) => {
+export const ProductSortSelect = ({ handleChange, defaultValue }) => {
   return (
     <>
       <label htmlFor="sortType">Sort by:</label>
@@ -61,7 +61,7 @@ export const AdminProductSortSelect = ({ handleChange, defaultValue }) => {
   );
 };
 
-export const AdminProductTypeFilters = ({ handleChange, defaultValue }) => {
+export const ProductTypeFilters = ({ handleChange, defaultValue }) => {
   return (
     <form
       onSubmit={(e) => {
@@ -82,10 +82,7 @@ export const AdminProductTypeFilters = ({ handleChange, defaultValue }) => {
   );
 };
 
-export const AdminProductIsOnDiscountFilter = ({
-  handleChange,
-  defaultValue,
-}) => {
+export const ProductIsOnDiscountFilter = ({ handleChange, defaultValue }) => {
   return (
     <>
       <label htmlFor={filterType.isOnDiscount}>Is on discount</label>
@@ -94,13 +91,13 @@ export const AdminProductIsOnDiscountFilter = ({
         name={filterType.isOnDiscount}
         type="checkbox"
         onChange={handleChange}
-        checked={defaultValue}
+        defaultChecked={defaultValue}
       />
     </>
   );
 };
 
-export const AdminProductSearch = ({ defaultValue, handleChange }) => {
+export const ProductSearch = ({ defaultValue, handleChange }) => {
   return (
     <form
       onSubmit={(e) => {
@@ -201,21 +198,21 @@ export default function ProductList() {
 
   return (
     <>
-      <AdminProductSortSelect
+      <ProductSortSelect
         handleChange={({ target: { value } }) => setSortTypeFilter(value)}
         defaultValue={sortTypeFilter}
       />
-      <AdminProductTypeFilters
+      <ProductTypeFilters
         handleChange={({ target: { value } }) => setTypeFilter(value)}
         defaultValue={typeFilter}
       />
-      <AdminProductIsOnDiscountFilter
+      <ProductIsOnDiscountFilter
         handleChange={({ target: { checked } }) =>
           setIsOnDiscountFilter(checked)
         }
         defaultValue={isOnDiscountFilter}
       />
-      <AdminProductSearch
+      <ProductSearch
         handleChange={({ target: { value } }) => setSearch(value)}
         defaultValue={search}
       />
