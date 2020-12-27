@@ -134,17 +134,20 @@ describe("ProductList", () => {
     JsonFetch.mockResolvedValueOnce({
       status: 200,
       json: () =>
-        Promise.resolve([
-          {
-            id: "1",
-            name: "Mackbook",
-            quantity: 5,
-            price: 10000,
-            isOnDiscount: true,
-            discountPrice: 9500,
-            firstImage: "imageMacbook.jpg",
-          },
-        ]),
+        Promise.resolve({
+          result: [
+            {
+              id: "1",
+              name: "Mackbook",
+              quantity: 5,
+              price: 10000,
+              isOnDiscount: true,
+              discountPrice: 9500,
+              firstImage: "imageMacbook.jpg",
+            },
+          ],
+          totalPages: 5,
+        }),
     });
 
     act(() => {
@@ -161,22 +164,29 @@ describe("ProductList", () => {
     );
   });
 
-  test.only("make request with correct parameters", async () => {
+  test("make request with correct parameters", async () => {
     JsonFetch.mockReturnValue({
       status: 200,
       json: () =>
-        Promise.resolve([
-          {
-            id: "1",
-            name: "Mackbook",
-            quantity: 5,
-            price: 10000,
-            isOnDiscount: true,
-            discountPrice: 9500,
-            firstImage: "imageMacbook.jpg",
-          },
-        ]),
+        Promise.resolve({
+          result: [
+            {
+              id: "1",
+              name: "Mackbook",
+              quantity: 5,
+              price: 10000,
+              isOnDiscount: true,
+              discountPrice: 9500,
+              firstImage: "imageMacbook.jpg",
+            },
+          ],
+          totalPages: 5,
+        }),
     });
+
+    const buttons = screen.getAllByRole("button");
+
+    userEvent.click(buttons[buttons.length - 1]);
 
     userEvent.type(
       screen.getByPlaceholderText("Search for a product..."),
@@ -198,13 +208,13 @@ describe("ProductList", () => {
       })
     );
 
-    expect(JsonFetch.mock.calls.length).toBe(5);
-    expect(JsonFetch.mock.calls[4][0]).toBe(
-      `${settings.baseURL}/api/Product?${filterType.type}=Laptop&${filterType.isOnDiscount}=true&sortType=${sortType.nameDescending}&search=Mackbook`
+    expect(JsonFetch.mock.calls).toHaveLength(6);
+    expect(JsonFetch.mock.calls[5][0]).toBe(
+      `${settings.baseURL}/api/Product?pageNumber=2&${filterType.type}=Laptop&${filterType.isOnDiscount}=true&sortType=${sortType.nameDescending}&search=Mackbook`
     );
-    expect(JsonFetch.mock.calls[4][1]).toBe("GET");
-    expect(JsonFetch.mock.calls[4][2]).toBe(false);
-    expect(JsonFetch.mock.calls[4][3]).toBe(null);
+    expect(JsonFetch.mock.calls[5][1]).toBe("GET");
+    expect(JsonFetch.mock.calls[5][2]).toBe(false);
+    expect(JsonFetch.mock.calls[5][3]).toBe(null);
 
     expect(await screen.findByText("Mackbook")).toBeInTheDocument();
   });
@@ -213,26 +223,29 @@ describe("ProductList", () => {
     JsonFetch.mockReturnValue({
       status: 200,
       json: () =>
-        Promise.resolve([
-          {
-            id: "1",
-            name: "Mackbook",
-            quantity: 5,
-            price: 10000,
-            isOnDiscount: true,
-            discountPrice: 9500,
-            firstImage: "imageMacbook.jpg",
-          },
-          {
-            id: "2",
-            name: "HP",
-            quantity: 15,
-            price: 5000,
-            isOnDiscount: false,
-            discountPrice: 4500,
-            firstImage: "imageHP.jpg",
-          },
-        ]),
+        Promise.resolve({
+          result: [
+            {
+              id: "1",
+              name: "Mackbook",
+              quantity: 5,
+              price: 10000,
+              isOnDiscount: true,
+              discountPrice: 9500,
+              firstImage: "imageMacbook.jpg",
+            },
+            {
+              id: "2",
+              name: "HP",
+              quantity: 15,
+              price: 5000,
+              isOnDiscount: false,
+              discountPrice: 4500,
+              firstImage: "imageHP.jpg",
+            },
+          ],
+          totalPages: 1,
+        }),
     });
 
     userEvent.type(
@@ -277,17 +290,20 @@ describe("ProductList", () => {
     JsonFetch.mockReturnValue({
       status: 200,
       json: () =>
-        Promise.resolve([
-          {
-            id: "1",
-            name: "Mackbook",
-            quantity: 5,
-            price: 10000,
-            isOnDiscount: true,
-            discountPrice: 9500,
-            firstImage: "imageMacbook.jpg",
-          },
-        ]),
+        Promise.resolve({
+          result: [
+            {
+              id: "1",
+              name: "Mackbook",
+              quantity: 5,
+              price: 10000,
+              isOnDiscount: true,
+              discountPrice: 9500,
+              firstImage: "imageMacbook.jpg",
+            },
+          ],
+          totalPages: 1,
+        }),
     });
 
     userEvent.type(

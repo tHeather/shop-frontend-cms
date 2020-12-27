@@ -4,13 +4,17 @@ import { filterType, sortType } from "../../../components/constants/constants";
 import { JsonFetch } from "../../../components/fetches/Fetches";
 import Loader from "../../../components/loader/Loader";
 import { DisplayImage } from "../../../components/Utils/ImageUtils/ImageUtils";
-import { DisplayItemList } from "../../../components/Utils/ListUtils/ListUtils";
+import {
+  DisplayItemList,
+  Pagination,
+} from "../../../components/Utils/ListUtils/ListUtils";
 import { MakeQueryString } from "../../../components/Utils/QueryStringUtils/QueryStringUtils";
 import { settings } from "../../../settings";
 import EditProduct from "../EditProduct/EditProduct";
 
 const getProducts = async (
   searchParams,
+  setTotalPages,
   setIsLoading,
   setProducts,
   history
@@ -26,8 +30,9 @@ const getProducts = async (
 
     switch (response.status) {
       case 200:
-        const products = await response.json();
-        setProducts(products);
+        const { result, totalPages } = await response.json();
+        setTotalPages(totalPages);
+        setProducts(result);
         setIsLoading(false);
         break;
       case 500:
@@ -143,12 +148,19 @@ const ProductTemplate = ({
   );
 };
 
-const MakeSearchParamsObject = (type, isOnDiscount, sortType, search) => {
+const MakeSearchParamsObject = (
+  pageNumber,
+  type,
+  isOnDiscount,
+  sortType,
+  search
+) => {
   return {
+    pageNumber,
     [filterType.type]: type,
     [filterType.isOnDiscount]: isOnDiscount,
-    sortType: sortType,
-    search: search,
+    sortType,
+    search,
   };
 };
 
@@ -157,9 +169,12 @@ export default function ProductList() {
   const [isOnDiscountFilter, setIsOnDiscountFilter] = useState(false);
   const [sortTypeFilter, setSortTypeFilter] = useState(sortType.nameAscending);
   const [search, setSearch] = useState("");
+  const [pageNumber, setPageNumber] = useState(1);
 
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [products, setProducts] = useState(null);
+
+  const [totalPages, setTotalPages] = useState(0);
 
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
@@ -168,16 +183,19 @@ export default function ProductList() {
     if (selectedProductId) return;
     getProducts(
       MakeSearchParamsObject(
+        pageNumber,
         typeFilter,
         isOnDiscountFilter,
         sortTypeFilter,
         search
       ),
+      setTotalPages,
       setIsLoading,
       setProducts,
       history
     );
   }, [
+    pageNumber,
     typeFilter,
     isOnDiscountFilter,
     sortTypeFilter,
@@ -229,6 +247,11 @@ export default function ProductList() {
           )}
         />
       )}
+      <Pagination
+        pageNumber={pageNumber}
+        setPageNumber={setPageNumber}
+        totalPages={totalPages}
+      />
     </>
   );
 }

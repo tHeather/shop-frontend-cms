@@ -202,7 +202,7 @@ const getProduct = async (
 };
 
 const deleteImage = async (
-  imageName,
+  image,
   productId,
   setSavedImages,
   setIsImageDeleted,
@@ -213,23 +213,26 @@ const deleteImage = async (
   try {
     setIsLoading(true);
 
-    const response = await FormDataFetch(
-      `${settings.baseURL}/api/Product/${productId}/${imageName}`,
+    const response = await JsonFetch(
+      `${settings.baseURL}/api/Product/${productId}/images/${image.name}`,
       "DELETE",
       true,
       null
     );
 
     switch (response.status) {
-      case 201:
+      case 204:
         setIsImageDeleted(true);
         setSavedImages((prev) => {
-          return { ...prev, [imageName]: null };
+          return { ...prev, [image.field]: null };
         });
         setIsLoading(false);
         break;
       case 404:
         setIsImageNotFund(true);
+        setSavedImages((prev) => {
+          return { ...prev, [image.field]: null };
+        });
         setIsLoading(false);
         break;
       case 401:
@@ -293,9 +296,12 @@ const SavedImages = ({
       <div>First image</div>
       <DisplayImage src={firstImage} />
       <button
+        type="button"
+        data-testid="deleteFirstImageBtn"
+        disabled={!firstImage}
         onClick={() =>
           deleteImage(
-            firstImage,
+            { field: "firstImage", name: firstImage },
             productId,
             setSavedImages,
             setIsImageDeleted,
@@ -310,9 +316,11 @@ const SavedImages = ({
       <div>Second image</div>
       <DisplayImage src={secondImage} />
       <button
+        type="button"
+        disabled={!secondImage}
         onClick={() =>
           deleteImage(
-            secondImage,
+            { field: "secondImage", name: secondImage },
             productId,
             setSavedImages,
             setIsImageDeleted,
@@ -327,9 +335,11 @@ const SavedImages = ({
       <div>Third image</div>
       <DisplayImage src={thirdImage} />
       <button
+        type="button"
+        disabled={!thirdImage}
         onClick={() =>
           deleteImage(
-            thirdImage,
+            { field: "thirdImage", name: thirdImage },
             productId,
             setSavedImages,
             setIsImageDeleted,
