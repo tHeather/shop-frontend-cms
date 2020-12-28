@@ -61,3 +61,5 @@ export const fileValidation = mixed()
     "The accepted file formats are jpg, jpeg, bmp, gif, png.",
     (value) => (value ? SUPPORTED_FORMATS.includes(value.type) : true)
   );
+
+export const colorConstraints = string().required("This field is required.");

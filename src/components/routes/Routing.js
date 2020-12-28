@@ -8,6 +8,7 @@ import CategoryList from "../../pages/MenuSettings/CategoryList/CategoryList";
 import SectionList from "../../pages/Sections/SectionList/SectionList";
 import SaveSection from "../../pages/Sections/SaveSection/SaveSection";
 import SaveProduct from "../../pages/Products/SaveProduct/SaveProduct";
+import ShopSettings from "../../pages/ShopSettings/ShopSettings";
 
 const PrivateRoute = ({ userEmail, children }) => {
   return userEmail ? children : <Redirect exact to="/" />;
@@ -49,6 +50,11 @@ export default function Routing() {
       <Route exact path="/products">
         <PrivateRoute userEmail={userEmail}>
           <ProductList />
+        </PrivateRoute>
+      </Route>
+      <Route exact path="/shop-settings">
+        <PrivateRoute userEmail={userEmail}>
+          <ShopSettings />
         </PrivateRoute>
       </Route>
       {/* Error */}

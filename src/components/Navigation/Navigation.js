@@ -31,6 +31,7 @@ const visualSettingsLinks = [
   { label: "Menu ", url: "/menu" },
   { label: "Current sections", url: "sections" },
   { label: "Add Section", url: "/add-sections" },
+  { label: "Shop settings", url: "/shop-settings" },
 ];
 
 export default function Navigation() {

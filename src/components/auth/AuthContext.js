@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, createContext } from "react";
 
-export const AuthContext = React.createContext();
+export const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
   const [userEmail, setUserEmail] = useState("");
