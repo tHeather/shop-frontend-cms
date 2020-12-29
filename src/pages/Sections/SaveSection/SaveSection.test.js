@@ -15,32 +15,12 @@ import { MemoryRouter, Route } from "react-router";
 jest.mock("../../../components/fetches/Fetches");
 
 describe("SaveSection: Save mode", () => {
-  test("render component correctly", () => {
-    act(() => {
-      render(<SaveSection />);
-    });
-    expect(
-      screen.getByText("Save section", { selector: "button" })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText("Search for a product...")
-    ).toBeInTheDocument();
-    expect(screen.getByText("Products in section (0)")).toBeInTheDocument();
-
-    const sectionNameInput = screen.getByLabelText("Section name:", {
-      selector: "input",
-    });
-    expect(sectionNameInput).toBeInTheDocument();
-    expect(sectionNameInput).toHaveValue("");
-    expect(JsonFetch.mock.calls).toHaveLength(0);
-  });
-
-  describe("SaveSection (POST)", () => {
-    beforeEach(async () => {
-      JsonFetch.mockReturnValueOnce({
-        status: 200,
-        json: () =>
-          Promise.resolve([
+  beforeEach(async () => {
+    JsonFetch.mockReturnValueOnce({
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          result: [
             {
               id: "1",
               name: "Mackbook",
@@ -50,34 +30,48 @@ describe("SaveSection: Save mode", () => {
               discountPrice: 9500,
               firstImage: "imageMacbook.jpg",
             },
-          ]),
-      });
+          ],
+          totalPages: 1,
+        }),
+    });
 
-      act(() => {
-        render(
-          <MemoryRouter initialEntries={["/admin/sections"]}>
-            <Route
-              exact
-              path="/admin/sections"
-              component={() => <SaveSection />}
-            />
-            <Route exact path="/" component={() => <div>Login page</div>} />
-            <Route
-              exact
-              path="/500"
-              component={() => <div>Server error</div>}
-            />
-          </MemoryRouter>
-        );
-      });
-
-      userEvent.type(
-        screen.getByPlaceholderText("Search for a product..."),
-        "Mackbook {enter}"
+    act(() => {
+      render(
+        <MemoryRouter initialEntries={["/admin/sections"]}>
+          <Route
+            exact
+            path="/admin/sections"
+            component={() => <SaveSection />}
+          />
+          <Route exact path="/" component={() => <div>Login page</div>} />
+          <Route exact path="/500" component={() => <div>Server error</div>} />
+        </MemoryRouter>
       );
+    });
+    await waitForElementToBeRemoved(() => screen.getByTestId("loader"));
+  });
 
+  test("render component correctly", () => {
+    expect(
+      screen.getByText("Save section", { selector: "button" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText("Search for a product...")
+    ).toBeInTheDocument();
+    expect(screen.getByText("Mackbook")).toBeInTheDocument();
+    expect(screen.getByText("Products in section (0)")).toBeInTheDocument();
+    const sectionNameInput = screen.getByLabelText("Section name:", {
+      selector: "input",
+    });
+    expect(sectionNameInput).toBeInTheDocument();
+    expect(sectionNameInput).toHaveValue("");
+    expect(JsonFetch.mock.calls).toHaveLength(1);
+  });
+
+  describe("SaveSection (POST)", () => {
+    beforeEach(async () => {
       userEvent.click(
-        within(await screen.findByRole("article")).getByRole("button")
+        screen.getByText("Add to section", { selector: "button" })
       );
 
       userEvent.type(
@@ -95,12 +89,14 @@ describe("SaveSection: Save mode", () => {
       userEvent.click(screen.getByText("Save section", { selector: "button" }));
       await waitForElementToBeRemoved(() => screen.getByTestId("loader"));
       expect(JsonFetch.mock.calls.length).toBe(2);
-      expect(JsonFetch.mock.calls[1][0]).toBe(`${settings.baseURL}/section`);
+      expect(JsonFetch.mock.calls[1][0]).toBe(
+        `${settings.baseURL}/api/Section`
+      );
       expect(JsonFetch.mock.calls[1][1]).toBe("POST");
       expect(JsonFetch.mock.calls[1][2]).toBe(true);
       expect(JsonFetch.mock.calls[1][3]).toEqual({
         title: "Section1",
-        products: ["1"],
+        ProductIds: ["1"],
       });
     });
 
@@ -157,7 +153,25 @@ describe("SaveSection: Save mode", () => {
 });
 
 describe("GetProducts (GET)", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    JsonFetch.mockReturnValueOnce({
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          result: [
+            {
+              id: "1",
+              name: "Mackbook",
+              quantity: 5,
+              price: 10000,
+              isOnDiscount: true,
+              discountPrice: 9500,
+              firstImage: "imageMacbook.jpg",
+            },
+          ],
+          totalPages: 2,
+        }),
+    });
     act(() => {
       render(
         <MemoryRouter initialEntries={["/admin/sections"]}>
@@ -171,28 +185,84 @@ describe("GetProducts (GET)", () => {
         </MemoryRouter>
       );
     });
+    await waitForElementToBeRemoved(() => screen.getByTestId("loader"));
   });
 
-  test("handle server response (GET, 200)", async () => {
+  test("make request with correct parameters (on mount)", async () => {
+    expect(JsonFetch.mock.calls.length).toBe(1);
+    expect(JsonFetch.mock.calls[0][0]).toBe(
+      `${settings.baseURL}/api/Product?pageNumber=1`
+    );
+    expect(JsonFetch.mock.calls[0][1]).toBe("GET");
+    expect(JsonFetch.mock.calls[0][2]).toBe(false);
+    expect(JsonFetch.mock.calls[0][3]).toBe(null);
+  });
+
+  test("make request with correct parameters (pagination)", async () => {
     JsonFetch.mockReturnValueOnce({
       status: 200,
       json: () =>
-        Promise.resolve([
-          {
-            id: "1",
-            name: "Mackbook",
-            quantity: 5,
-            price: 10000,
-            isOnDiscount: true,
-            discountPrice: 9500,
-            firstImage: "imageMacbook.jpg",
-          },
-        ]),
+        Promise.resolve({
+          result: [
+            {
+              id: "1",
+              name: "Mackbook",
+              quantity: 5,
+              price: 10000,
+              isOnDiscount: true,
+              discountPrice: 9500,
+              firstImage: "imageMacbook.jpg",
+            },
+          ],
+          totalPages: 2,
+        }),
+    });
+    userEvent.click(screen.getByTestId("paginationNextBtn"));
+    await waitForElementToBeRemoved(() => screen.getByTestId("loader"));
+    expect(JsonFetch.mock.calls.length).toBe(2);
+    expect(JsonFetch.mock.calls[1][0]).toBe(
+      `${settings.baseURL}/api/Product?pageNumber=2`
+    );
+    expect(JsonFetch.mock.calls[1][1]).toBe("GET");
+    expect(JsonFetch.mock.calls[1][2]).toBe(false);
+    expect(JsonFetch.mock.calls[1][3]).toBe(null);
+  });
+
+  test("make request with correct parameters (search)", async () => {
+    JsonFetch.mockReturnValueOnce({
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          result: [
+            {
+              id: "1",
+              name: "Mackbook",
+              quantity: 5,
+              price: 10000,
+              isOnDiscount: true,
+              discountPrice: 9500,
+              firstImage: "imageMacbook.jpg",
+            },
+          ],
+          totalPages: 2,
+        }),
     });
     userEvent.type(
       screen.getByPlaceholderText("Search for a product..."),
-      "Mackbook {enter}"
+      "Mackbook"
     );
+    userEvent.tab();
+    await waitForElementToBeRemoved(() => screen.getByTestId("loader"));
+    expect(JsonFetch.mock.calls.length).toBe(2);
+    expect(JsonFetch.mock.calls[1][0]).toBe(
+      `${settings.baseURL}/api/Product?pageNumber=1&search=Mackbook`
+    );
+    expect(JsonFetch.mock.calls[1][1]).toBe("GET");
+    expect(JsonFetch.mock.calls[1][2]).toBe(false);
+    expect(JsonFetch.mock.calls[1][3]).toBe(null);
+  });
+
+  test("handle server response (GET, 200)", async () => {
     const image = await screen.findByAltText("Mackbook");
     expect(image.getAttribute("src")).toBe(
       `${settings.baseURL}/imageMacbook.jpg`
@@ -208,8 +278,9 @@ describe("GetProducts (GET)", () => {
     });
     userEvent.type(
       screen.getByPlaceholderText("Search for a product..."),
-      "Mackbook {enter}"
+      "Mackbook"
     );
+    userEvent.tab();
     expect(await screen.findByText("Server error")).toBeInTheDocument();
   });
 });
@@ -245,14 +316,31 @@ describe("SaveProduct: update mode", () => {
             },
           ],
         }),
+    }).mockReturnValueOnce({
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          result: [
+            {
+              id: "4",
+              name: "Dell",
+              quantity: 1,
+              price: 10,
+              isOnDiscount: true,
+              discountPrice: 950,
+              firstImage: "imageDell.jpg",
+            },
+          ],
+          totalPages: 2,
+        }),
     });
 
     act(() => {
       render(
-        <MemoryRouter initialEntries={["/admin/sections"]}>
+        <MemoryRouter initialEntries={["/sections"]}>
           <Route
             exact
-            path="/admin/sections"
+            path="/sections"
             component={() => (
               <SaveSection
                 sectionId="12345"
@@ -285,7 +373,7 @@ describe("SaveProduct: update mode", () => {
     });
     expect(sectionNameInput).toBeInTheDocument();
     expect(sectionNameInput).toHaveValue("Section1");
-    expect(JsonFetch.mock.calls).toHaveLength(1);
+    expect(JsonFetch.mock.calls).toHaveLength(2);
 
     const image = await screen.findByAltText("Mackbook");
     expect(image.getAttribute("src")).toBe(
@@ -297,9 +385,9 @@ describe("SaveProduct: update mode", () => {
   });
 
   test("make request with correct parameters (saveSection, GET)", async () => {
-    expect(JsonFetch.mock.calls.length).toBe(1);
+    expect(JsonFetch.mock.calls.length).toBe(2);
     expect(JsonFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/section/12345`
+      `${settings.baseURL}/api/Section/12345`
     );
     expect(JsonFetch.mock.calls[0][1]).toBe("GET");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);
@@ -328,29 +416,33 @@ describe("SaveProduct: update mode", () => {
       expect(sectionNameInput).toHaveValue("Updated section");
     });
 
-    test("update section product list (add prodcut)", async () => {
+    test("update section product list (add product)", async () => {
       JsonFetch.mockReturnValueOnce({
         status: 200,
         json: () =>
-          Promise.resolve([
-            {
-              id: "2",
-              name: "HP",
-              quantity: 10,
-              price: 5000,
-              isOnDiscount: true,
-              discountPrice: 4500,
-              firstImage: "Hp.jpg",
-            },
-          ]),
+          Promise.resolve({
+            result: [
+              {
+                id: "4",
+                name: "HP",
+                quantity: 1,
+                price: 10,
+                isOnDiscount: true,
+                discountPrice: 950,
+                firstImage: "imageHP.jpg",
+              },
+            ],
+            totalPages: 2,
+          }),
       }).mockReturnValueOnce({
         status: 204,
       });
 
       userEvent.type(
         screen.getByPlaceholderText("Search for a product..."),
-        "HP {enter}"
+        "HP"
       );
+      userEvent.tab();
 
       const productContainers = await screen.findAllByRole("article");
       const addButton = within(productContainers[0]).getByRole("button");
@@ -363,6 +455,8 @@ describe("SaveProduct: update mode", () => {
       userEvent.click(screen.getByText("OK"));
 
       expect(await screen.findAllByText("HP")).toHaveLength(2);
+      expect(await screen.findByText("Mackbook")).toBeInTheDocument();
+      expect(await screen.findByText("ASUS")).toBeInTheDocument();
     });
 
     test("update section product list (remove prodcut)", async () => {
@@ -371,7 +465,9 @@ describe("SaveProduct: update mode", () => {
       });
 
       const productContainers = await screen.findAllByRole("article");
-      const deletebutton = within(productContainers[0]).getByRole("button");
+      const deletebutton = within(
+        productContainers[productContainers.length - 1]
+      ).getByRole("button");
       userEvent.click(deletebutton);
       userEvent.click(screen.getByText("Save section", { selector: "button" }));
 
@@ -380,31 +476,34 @@ describe("SaveProduct: update mode", () => {
       ).toBeInTheDocument();
       userEvent.click(screen.getByText("OK"));
 
-      expect(screen.queryByText("Mackbook")).not.toBeInTheDocument();
+      expect(screen.getByText("Mackbook")).toBeInTheDocument();
+      expect(screen.queryByText("ASUS")).not.toBeInTheDocument();
     });
 
-    test("make request with correct parameters", async () => {
+    test("make request with correct parameters (PUT)", async () => {
       JsonFetch.mockReturnValueOnce({
         status: 204,
       });
 
       const productContainers = await screen.findAllByRole("article");
-      const deletebutton = within(productContainers[0]).getByRole("button");
+      const deletebutton = within(
+        productContainers[productContainers.length - 1]
+      ).getByRole("button");
       userEvent.click(deletebutton);
       userEvent.click(screen.getByText("Save section", { selector: "button" }));
       expect(
         await screen.findByText("Section saved successfully.")
       ).toBeInTheDocument();
 
-      expect(JsonFetch.mock.calls.length).toBe(2);
-      expect(JsonFetch.mock.calls[1][0]).toBe(
-        `${settings.baseURL}/section/12345`
+      expect(JsonFetch.mock.calls).toHaveLength(3);
+      expect(JsonFetch.mock.calls[2][0]).toBe(
+        `${settings.baseURL}/api/Section/12345`
       );
-      expect(JsonFetch.mock.calls[1][1]).toBe("PUT");
-      expect(JsonFetch.mock.calls[1][2]).toBe(true);
-      expect(JsonFetch.mock.calls[1][3]).toEqual({
+      expect(JsonFetch.mock.calls[2][1]).toBe("PUT");
+      expect(JsonFetch.mock.calls[2][2]).toBe(true);
+      expect(JsonFetch.mock.calls[2][3]).toEqual({
         title: "Section1",
-        products: ["3"],
+        ProductIds: ["1"],
       });
     });
 
@@ -414,7 +513,9 @@ describe("SaveProduct: update mode", () => {
       });
 
       const productContainers = await screen.findAllByRole("article");
-      const deletebutton = within(productContainers[0]).getByRole("button");
+      const deletebutton = within(
+        productContainers[productContainers.length - 1]
+      ).getByRole("button");
       userEvent.click(deletebutton);
       userEvent.click(screen.getByText("Save section", { selector: "button" }));
       await waitForElementToBeRemoved(() => screen.getByTestId("loader"));
@@ -427,7 +528,9 @@ describe("SaveProduct: update mode", () => {
       });
 
       const productContainers = await screen.findAllByRole("article");
-      const deletebutton = within(productContainers[0]).getByRole("button");
+      const deletebutton = within(
+        productContainers[productContainers.length - 1]
+      ).getByRole("button");
       userEvent.click(deletebutton);
       userEvent.click(screen.getByText("Save section", { selector: "button" }));
       await waitForElementToBeRemoved(() => screen.getByTestId("loader"));
@@ -440,7 +543,9 @@ describe("SaveProduct: update mode", () => {
       });
 
       const productContainers = await screen.findAllByRole("article");
-      const deletebutton = within(productContainers[0]).getByRole("button");
+      const deletebutton = within(
+        productContainers[productContainers.length - 1]
+      ).getByRole("button");
       userEvent.click(deletebutton);
       userEvent.click(screen.getByText("Save section", { selector: "button" }));
       await waitForElementToBeRemoved(() => screen.getByTestId("loader"));
@@ -450,8 +555,6 @@ describe("SaveProduct: update mode", () => {
 });
 
 test("handle server response (getSection,GET, 500)", async () => {
-  const mockedSetSelectedSectionId = jest.fn();
-
   JsonFetch.mockReturnValueOnce({
     status: 500,
   });
@@ -459,16 +562,7 @@ test("handle server response (getSection,GET, 500)", async () => {
   act(() => {
     render(
       <MemoryRouter initialEntries={["/admin/sections"]}>
-        <Route
-          exact
-          path="/admin/sections"
-          component={() => (
-            <SaveSection
-              sectionId="12345"
-              setSelectedSectionId={mockedSetSelectedSectionId}
-            />
-          )}
-        />
+        <Route exact path="/admin/sections" component={() => <SaveSection />} />
         <Route exact path="/500" component={() => <div>Server error</div>} />
       </MemoryRouter>
     );

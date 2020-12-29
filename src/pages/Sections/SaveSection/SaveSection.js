@@ -3,16 +3,24 @@ import { useHistory } from "react-router";
 import { HandleUnauthorizedOrForbiddenError } from "../../../components/Errors/ErrorHandlers";
 import { JsonFetch } from "../../../components/fetches/Fetches";
 import Loader from "../../../components/loader/Loader";
-import { Modal } from "../../../components/Messages/Modal";
+import { InfoModal } from "../../../components/Messages/Modal";
 import { DisplayImage } from "../../../components/Utils/ImageUtils/ImageUtils";
-import { DisplayItemList } from "../../../components/Utils/ListUtils/ListUtils";
+import { Pagination } from "../../../components/Utils/ListUtils/ListUtils";
 import { settings } from "../../../settings";
 
-const getProducts = async (search, setIsLoading, setProducts, history) => {
+const getProducts = async (
+  search,
+  pageNumber,
+  setTotalPages,
+  setProducts,
+  setIsLoading,
+  history
+) => {
   try {
     setIsLoading(true);
+    const searchParam = search ? `&search=${search}` : "";
     const response = await JsonFetch(
-      `${settings.baseURL}/product?search=${search}`,
+      `${settings.baseURL}/api/Product?pageNumber=${pageNumber}${searchParam}`,
       "GET",
       false,
       null
@@ -20,8 +28,9 @@ const getProducts = async (search, setIsLoading, setProducts, history) => {
 
     switch (response.status) {
       case 200:
-        const products = await response.json();
-        setProducts(products);
+        const { result, totalPages } = await response.json();
+        setTotalPages(totalPages);
+        setProducts(result);
         setIsLoading(false);
         break;
       case 500:
@@ -46,7 +55,7 @@ const getSection = async (
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/section/${sectionId}`,
+      `${settings.baseURL}/api/Section/${sectionId}`,
       "GET",
       false,
       null
@@ -80,7 +89,7 @@ const saveSection = async (
   sectionName,
   sectionProducts,
   setIsSaved,
-  setisNotFund,
+  setisSectionNotFund,
   setIsLoading,
   history
 ) => {
@@ -89,14 +98,14 @@ const saveSection = async (
   try {
     setIsLoading(true);
 
-    const url = `${settings.baseURL}/section${
+    const url = `${settings.baseURL}/api/Section${
       sectionId ? `/${sectionId}` : ""
     }`;
     const method = sectionId ? "PUT" : "POST";
 
     const response = await JsonFetch(url, method, true, {
       title: sectionName,
-      products: sectionProducts.map(({ id }) => id),
+      ProductIds: sectionProducts.map(({ id }) => id),
     });
 
     switch (response.status) {
@@ -115,7 +124,7 @@ const saveSection = async (
         HandleUnauthorizedOrForbiddenError(history);
         break;
       case 404:
-        setisNotFund(true);
+        setisSectionNotFund(true);
         setIsLoading(false);
         break;
       case 500:
@@ -128,24 +137,6 @@ const saveSection = async (
   } catch (err) {
     console.error(err);
   }
-};
-
-const SavedModal = ({ setIsSaved }) => {
-  return (
-    <Modal>
-      <p>Section saved successfully.</p>
-      <button onClick={() => setIsSaved(false)}>OK</button>
-    </Modal>
-  );
-};
-
-const NotFoundModal = ({ setSelectedSectionId }) => {
-  return (
-    <Modal>
-      <p>Section not found.</p>
-      <button onClick={() => setSelectedSectionId(null)}>OK</button>
-    </Modal>
-  );
 };
 
 const addProductToSection = (product, setSectionProducts) => {
@@ -163,34 +154,77 @@ const removeProductFromSection = (product, setSectionProducts) => {
   });
 };
 
-const ProductTemplate = ({ product, setSectionProducts, isRemoveMode }) => {
-  const { name, firstImage, price, isOnDiscount, discountPrice } = product;
+const ProductList = ({ products, setSectionProducts, isRemoveMode }) => {
+  if (!Array.isArray(products)) return null;
+
+  if (products.length < 1)
+    return (
+      <p>
+        {isRemoveMode
+          ? "There are no products in section yet."
+          : "There are no product that meet your criteria."}
+      </p>
+    );
+
   const handleBtnClick = isRemoveMode
     ? removeProductFromSection
     : addProductToSection;
 
+  return products.map((product) => {
+    const {
+      id,
+      name,
+      firstImage,
+      price,
+      isOnDiscount,
+      discountPrice,
+    } = product;
+    return (
+      <article key={id}>
+        <DisplayImage src={firstImage} alt={name} />
+        <p>{name}</p>
+        <p>{price}</p>
+        {isOnDiscount && <p>{discountPrice}</p>}
+        <button onClick={() => handleBtnClick(product, setSectionProducts)}>
+          {isRemoveMode ? "Remove from section" : "Add to section"}
+        </button>
+      </article>
+    );
+  });
+};
+
+export const ProductSearch = ({ defaultValue, handleChange }) => {
   return (
-    <article>
-      <DisplayImage src={firstImage} alt={name} />
-      <p>{name}</p>
-      <p>{price}</p>
-      {isOnDiscount && <p>{discountPrice}</p>}
-      <button onClick={() => handleBtnClick(product, setSectionProducts)}>
-        {isRemoveMode ? "Remove" : "Add"}
-      </button>
-    </article>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.target[0].blur();
+      }}
+    >
+      <input
+        name="search"
+        type="text"
+        maxLength="150"
+        placeholder="Search for a product..."
+        onBlur={handleChange}
+        defaultValue={defaultValue}
+      />
+      <button>Submit</button>
+    </form>
   );
 };
 
 export default function SaveSection({ sectionId, setSelectedSectionId }) {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [sectionProducts, setSectionProducts] = useState([]);
   const [sectionName, setSectionName] = useState("");
 
   const [isSaved, setIsSaved] = useState(false);
-  const [isNotFund, setisNotFund] = useState(false);
+  const [isSectionNotFund, setisSectionNotFund] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
 
@@ -205,13 +239,52 @@ export default function SaveSection({ sectionId, setSelectedSectionId }) {
     );
   }, []);
 
-  if (isNotFund)
-    return <NotFoundModal setSelectedSectionId={setSelectedSectionId} />;
-  if (isSaved) return <SavedModal setIsSaved={setIsSaved} />;
+  useEffect(() => {
+    getProducts(
+      search,
+      pageNumber,
+      setTotalPages,
+      setProducts,
+      setIsLoading,
+      history
+    );
+  }, [search, pageNumber]);
+
+  if (isSectionNotFund)
+    return (
+      <InfoModal
+        closeHandler={() => setSelectedSectionId(null)}
+        btnText="Back to list"
+      >
+        <p>Section not found.</p>
+      </InfoModal>
+    );
+
+  if (isSaved)
+    return (
+      <InfoModal closeHandler={() => setIsSaved(false)} btnText="OK">
+        <p>Section saved successfully.</p>
+      </InfoModal>
+    );
+
   if (isLoading) return <Loader />;
 
   return (
     <>
+      <ProductSearch
+        handleChange={({ target: { value } }) => setSearch(value)}
+        defaultValue={search}
+      />
+      <ProductList
+        products={products}
+        setSectionProducts={setSectionProducts}
+      />
+      <Pagination
+        pageNumber={pageNumber}
+        setPageNumber={setPageNumber}
+        totalPages={totalPages}
+      />
+
       <button
         onClick={() =>
           saveSection(
@@ -223,7 +296,7 @@ export default function SaveSection({ sectionId, setSelectedSectionId }) {
             sectionName,
             sectionProducts,
             setIsSaved,
-            setisNotFund,
+            setisSectionNotFund,
             setIsLoading,
             history
           )
@@ -232,34 +305,6 @@ export default function SaveSection({ sectionId, setSelectedSectionId }) {
       >
         Save section
       </button>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          getProducts(search, setIsLoading, setProducts, history);
-        }}
-      >
-        <input
-          name="search"
-          type="text"
-          maxLength="150"
-          onChange={({ target: { value } }) => setSearch(value)}
-          placeholder="Search for a product..."
-        />
-        <button>Submit</button>
-      </form>
-
-      <DisplayItemList
-        items={products}
-        ItemTemplate={(item) => (
-          <ProductTemplate
-            isRemoveMode={false}
-            product={item}
-            setSectionProducts={setSectionProducts}
-          />
-        )}
-      />
-
       <h2>Products in section ({sectionProducts.length})</h2>
       <label htmlFor="sectionName">Section name:</label>
       <input
@@ -269,18 +314,11 @@ export default function SaveSection({ sectionId, setSelectedSectionId }) {
         type="text"
         defaultValue={sectionName}
       />
-      {sectionProducts.length > 0 && (
-        <DisplayItemList
-          items={sectionProducts}
-          ItemTemplate={(item) => (
-            <ProductTemplate
-              isRemoveMode={true}
-              product={item}
-              setSectionProducts={setSectionProducts}
-            />
-          )}
-        />
-      )}
+      <ProductList
+        products={sectionProducts}
+        setSectionProducts={setSectionProducts}
+        isRemoveMode={true}
+      />
     </>
   );
 }

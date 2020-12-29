@@ -11,7 +11,7 @@ const getSections = async (setSections, setIsLoading, history) => {
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/section/section-names`,
+      `${settings.baseURL}/api/Section`,
       "GET",
       false,
       null
@@ -39,7 +39,7 @@ const deleteSection = async (id, setIsDeleted, setIsLoading, history) => {
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/section/${id}`,
+      `${settings.baseURL}/api/Section/${id}`,
       "DELETE",
       true,
       null

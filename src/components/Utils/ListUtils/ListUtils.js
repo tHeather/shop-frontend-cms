@@ -53,6 +53,7 @@ export const Pagination = ({ pageNumber, setPageNumber, totalPages }) => {
         / {totalPages}
       </span>
       <button
+        data-testid="paginationNextBtn"
         disabled={pageNumber === totalPages}
         onClick={() =>
           setPageNumber((prev) =>
