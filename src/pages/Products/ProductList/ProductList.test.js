@@ -184,7 +184,7 @@ describe("ProductList", () => {
         }),
     });
 
-    const buttons = screen.getAllByRole("button");
+    const buttons = await screen.findAllByRole("button");
 
     userEvent.click(buttons[buttons.length - 1]);
 

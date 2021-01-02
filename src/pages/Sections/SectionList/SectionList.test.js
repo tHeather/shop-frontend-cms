@@ -102,7 +102,7 @@ describe("SectionList", () => {
   test("make request with correct parameters (GET)", async () => {
     expect(JsonFetch.mock.calls.length).toBe(1);
     expect(JsonFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/section/section-names`
+      `${settings.baseURL}/api/Section/names`
     );
     expect(JsonFetch.mock.calls[0][1]).toBe("GET");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);
@@ -127,7 +127,9 @@ describe("SectionList", () => {
     ).toBeInTheDocument();
 
     expect(JsonFetch.mock.calls.length).toBe(2);
-    expect(JsonFetch.mock.calls[1][0]).toBe(`${settings.baseURL}/section/1`);
+    expect(JsonFetch.mock.calls[1][0]).toBe(
+      `${settings.baseURL}/api/Section/1`
+    );
     expect(JsonFetch.mock.calls[1][1]).toBe("DELETE");
     expect(JsonFetch.mock.calls[1][2]).toBe(true);
     expect(JsonFetch.mock.calls[1][3]).toBe(null);
@@ -204,6 +206,23 @@ describe("SectionList", () => {
     JsonFetch.mockReturnValueOnce({
       status: 200,
       json: () => Promise.resolve({ title: "", products: [] }),
+    }).mockReturnValueOnce({
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          result: [
+            {
+              id: "1",
+              name: "Mackbook",
+              quantity: 5,
+              price: 10000,
+              isOnDiscount: true,
+              discountPrice: 9500,
+              firstImage: "imageMacbook.jpg",
+            },
+          ],
+          totalPages: 1,
+        }),
     });
 
     const list = screen.getByRole("list");

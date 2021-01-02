@@ -4,10 +4,7 @@ import { filterType, sortType } from "../../../components/constants/constants";
 import { JsonFetch } from "../../../components/fetches/Fetches";
 import Loader from "../../../components/loader/Loader";
 import { DisplayImage } from "../../../components/Utils/ImageUtils/ImageUtils";
-import {
-  DisplayItemList,
-  Pagination,
-} from "../../../components/Utils/ListUtils/ListUtils";
+import { Pagination } from "../../../components/Utils/ListUtils/ListUtils";
 import { MakeQueryString } from "../../../components/Utils/QueryStringUtils/QueryStringUtils";
 import { settings } from "../../../settings";
 import EditProduct from "../EditProduct/EditProduct";
@@ -123,28 +120,32 @@ export const ProductSearch = ({ defaultValue, handleChange }) => {
   );
 };
 
-const ProductTemplate = ({
-  itemData: {
-    id,
-    manufacturer,
-    name,
-    quantity,
-    firstImage,
-    price,
-    isOnDiscount,
-    discountPrice,
-  },
-  handleOnClick,
-}) => {
-  return (
-    <article onClick={() => handleOnClick(id)}>
-      <DisplayImage src={firstImage} alt={name} />
-      <p>{name}</p>
-      <p>{manufacturer}</p>
-      <p>{quantity}</p>
-      <p>{price}</p>
-      {isOnDiscount && <p>{discountPrice}</p>}
-    </article>
+const DisplayProductList = ({ products, handleOnClick }) => {
+  if (!Array.isArray(products)) return null;
+
+  if (products.length < 1)
+    return <p>There are no product which meet your criteria.</p>;
+
+  return products.map(
+    ({
+      id,
+      manufacturer,
+      name,
+      quantity,
+      firstImage,
+      price,
+      isOnDiscount,
+      discountPrice,
+    }) => (
+      <article key={id} onClick={() => handleOnClick(id)}>
+        <DisplayImage src={firstImage} alt={name} />
+        <p>{name}</p>
+        <p>{manufacturer}</p>
+        <p>{quantity}</p>
+        <p>{price}</p>
+        {isOnDiscount && <p>{discountPrice}</p>}
+      </article>
+    )
   );
 };
 
@@ -237,14 +238,9 @@ export default function ProductList() {
       {isLoading ? (
         <Loader />
       ) : (
-        <DisplayItemList
-          items={products}
-          ItemTemplate={(item) => (
-            <ProductTemplate
-              itemData={item}
-              handleOnClick={setSelectedProductId}
-            />
-          )}
+        <DisplayProductList
+          products={products}
+          handleOnClick={setSelectedProductId}
         />
       )}
       <Pagination

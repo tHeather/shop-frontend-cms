@@ -11,7 +11,7 @@ const getSections = async (setSections, setIsLoading, history) => {
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Section`,
+      `${settings.baseURL}/api/Section/names`,
       "GET",
       false,
       null

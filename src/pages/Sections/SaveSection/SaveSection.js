@@ -162,7 +162,7 @@ const ProductList = ({ products, setSectionProducts, isRemoveMode }) => {
       <p>
         {isRemoveMode
           ? "There are no products in section yet."
-          : "There are no product that meet your criteria."}
+          : "There are no product which meet your criteria."}
       </p>
     );
 
