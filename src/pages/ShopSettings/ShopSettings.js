@@ -1,5 +1,5 @@
 import { Form, Formik } from "formik";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useHistory } from "react-router";
 import { object } from "yup";
 import {
@@ -7,9 +7,10 @@ import {
   HandleUnauthorizedOrForbiddenError,
 } from "../../components/Errors/ErrorHandlers";
 import ErrorModal from "../../components/Errors/ErrorModal";
-import { FormDataFetch, JsonFetch } from "../../components/fetches/Fetches";
+import { FormDataFetch } from "../../components/fetches/Fetches";
 import {
   FileUploadField,
+  SelectField,
   StandardField,
 } from "../../components/forms/fields/Fields";
 import {
@@ -22,8 +23,9 @@ import { ShopSettingsContext } from "../../components/shopSettingsContext/shopSe
 import { MakeFormData } from "../../components/Utils/formDataUtils/FormDataUtils";
 import { DisplayImage } from "../../components/Utils/ImageUtils/ImageUtils";
 import { settings } from "../../settings";
+import { CURRENCY } from "../../components/constants/constants";
 
-const updateProduct = async (
+const updateSettings = async (
   setShopSettings,
   settingsValues,
   setIsSaved,
@@ -34,17 +36,16 @@ const updateProduct = async (
   try {
     setIsLoading(true);
 
-    /* const response = await FormDataFetch(
-      `${settings.baseURL}/api/Theme`,
+    const response = await FormDataFetch(
+      `${settings.baseURL}/api/ShopSettings`,
       "PUT",
       MakeFormData(settingsValues)
-    ); */
-
-    const response = { status: 204 };
+    );
 
     switch (response.status) {
-      case 204:
-        setShopSettings({ ...settingsValues, logo: "placeholder" });
+      case 200:
+        const settingData = await response.json();
+        setShopSettings(settingData);
         setIsSaved(true);
         setIsLoading(false);
         break;
@@ -87,7 +88,7 @@ export default function ShopSettings() {
   if (isSaved)
     return (
       <InfoModal closeHandler={() => setIsSaved(false)} btnText="OK">
-        <p>Theme successfully saved.</p>
+        <p>Settings successfully saved.</p>
       </InfoModal>
     );
 
@@ -102,7 +103,7 @@ export default function ShopSettings() {
         validationSchema={validationSchema}
         initialValues={{ ...settings, logo: "" }}
         onSubmit={(settingsValues) =>
-          updateProduct(
+          updateSettings(
             setShopSettings,
             settingsValues,
             setIsSaved,
@@ -129,6 +130,14 @@ export default function ShopSettings() {
               label="Tertiary color"
               type="color"
             />
+
+            <SelectField name="currency" label="Currency">
+              {CURRENCY.map((currency, index) => (
+                <option key={currency} value={index}>
+                  {currency}
+                </option>
+              ))}
+            </SelectField>
 
             <DisplayImage src={logo} />
 

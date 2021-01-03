@@ -42,3 +42,17 @@ export function FileUploadField({ label, ...props }) {
     </div>
   );
 }
+
+export const SelectField = ({ label, children, ...props }) => {
+  const [field, meta] = useField(props.name);
+  const id = props.id ? props.id : props.name;
+  return (
+    <>
+      <label htmlFor={id}>{label}</label>
+      <select id={id} {...field} {...props}>
+        {children}
+      </select>
+      {meta.touched && meta.error ? <div>{meta.error}</div> : null}
+    </>
+  );
+};

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { filterType, sortType } from "../../../components/constants/constants";
+import {
+  FILTER_TYPE,
+  SORT_TYPES,
+} from "../../../components/constants/constants";
 import { JsonFetch } from "../../../components/fetches/Fetches";
 import Loader from "../../../components/loader/Loader";
 import { DisplayImage } from "../../../components/Utils/ImageUtils/ImageUtils";
@@ -54,10 +57,12 @@ export const ProductSortSelect = ({ handleChange, defaultValue }) => {
         onChange={handleChange}
         defaultValue={defaultValue}
       >
-        <option value={sortType.nameAscending}>Name ascending</option>
-        <option value={sortType.nameDescending}>Name descending</option>
-        <option value={sortType.quantityAscending}>Quantity ascending</option>
-        <option value={sortType.quantityDescending}>Quantity descending</option>
+        <option value={SORT_TYPES.nameAscending}>Name ascending</option>
+        <option value={SORT_TYPES.nameDescending}>Name descending</option>
+        <option value={SORT_TYPES.quantityAscending}>Quantity ascending</option>
+        <option value={SORT_TYPES.quantityDescending}>
+          Quantity descending
+        </option>
       </select>
     </>
   );
@@ -71,10 +76,10 @@ export const ProductTypeFilters = ({ handleChange, defaultValue }) => {
         e.target[0].blur();
       }}
     >
-      <label htmlFor={filterType.type}>Type of product</label>
+      <label htmlFor={FILTER_TYPE.type}>Type of product</label>
       <input
-        id={filterType.type}
-        name={filterType.type}
+        id={FILTER_TYPE.type}
+        name={FILTER_TYPE.type}
         type="text"
         maxLength="150"
         onBlur={handleChange}
@@ -87,10 +92,10 @@ export const ProductTypeFilters = ({ handleChange, defaultValue }) => {
 export const ProductIsOnDiscountFilter = ({ handleChange, defaultValue }) => {
   return (
     <>
-      <label htmlFor={filterType.isOnDiscount}>Is on discount</label>
+      <label htmlFor={FILTER_TYPE.isOnDiscount}>Is on discount</label>
       <input
-        id={filterType.isOnDiscount}
-        name={filterType.isOnDiscount}
+        id={FILTER_TYPE.isOnDiscount}
+        name={FILTER_TYPE.isOnDiscount}
         type="checkbox"
         onChange={handleChange}
         defaultChecked={defaultValue}
@@ -158,8 +163,8 @@ const MakeSearchParamsObject = (
 ) => {
   return {
     pageNumber,
-    [filterType.type]: type,
-    [filterType.isOnDiscount]: isOnDiscount,
+    [FILTER_TYPE.type]: type,
+    [FILTER_TYPE.isOnDiscount]: isOnDiscount,
     sortType,
     search,
   };
@@ -168,7 +173,9 @@ const MakeSearchParamsObject = (
 export default function ProductList() {
   const [typeFilter, setTypeFilter] = useState("");
   const [isOnDiscountFilter, setIsOnDiscountFilter] = useState(false);
-  const [sortTypeFilter, setSortTypeFilter] = useState(sortType.nameAscending);
+  const [sortTypeFilter, setSortTypeFilter] = useState(
+    SORT_TYPES.nameAscending
+  );
   const [search, setSearch] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
 

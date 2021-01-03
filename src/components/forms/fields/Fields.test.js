@@ -1,6 +1,11 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import { Form, Formik } from "formik";
-import { FileUploadField, StandardField, TextArea } from "./Fields";
+import {
+  FileUploadField,
+  SelectField,
+  StandardField,
+  TextArea,
+} from "./Fields";
 import "@testing-library/jest-dom/extend-expect";
 import userEvent from "@testing-library/user-event";
 
@@ -171,4 +176,54 @@ test("FileUploadField: upload file", async () => {
   });
 
   expect(valueChecker.mock.calls[1][0]).toStrictEqual(file);
+});
+
+describe("SelectField", () => {
+  beforeEach(() => {
+    const options = [
+      <option key={0} value={0}>
+        Zero
+      </option>,
+      <option key={1} value={1}>
+        One
+      </option>,
+    ];
+
+    act(() => {
+      render(
+        <Formik initialValues={{ testLabel: "" }}>
+          {({ values: { testName } }) => {
+            return (
+              <>
+                <div data-testid="output">{testName}</div>
+                <Form>
+                  <SelectField id="testName" name="testName" label="Test label">
+                    {options}
+                  </SelectField>
+                </Form>
+              </>
+            );
+          }}
+        </Formik>
+      );
+    });
+  });
+
+  test("render component correctly", () => {
+    const selectTag = document.getElementById("testName");
+    const optionsTags = within(selectTag).getAllByRole("option");
+    expect(optionsTags).toHaveLength(2);
+    expect(optionsTags[0]).toHaveValue("0");
+    expect(optionsTags[0]).toHaveTextContent("Zero");
+    expect(optionsTags[1]).toHaveValue("1");
+    expect(optionsTags[1]).toHaveTextContent("One");
+  });
+
+  test("select option", async () => {
+    const selectTag = document.getElementById("testName");
+    const output = screen.getByTestId("output");
+    userEvent.selectOptions(selectTag, "1");
+    await waitFor(() => expect(output).toBeInTheDocument());
+    expect(output).toHaveTextContent(1);
+  });
 });

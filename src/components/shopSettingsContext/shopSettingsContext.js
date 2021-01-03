@@ -6,7 +6,7 @@ import { JsonFetch } from "../fetches/Fetches";
 const getSettings = async (setShopSettings, history) => {
   try {
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Theme`,
+      `${settings.baseURL}/api/ShopSettings`,
       "GET",
       false,
       null
@@ -14,15 +14,8 @@ const getSettings = async (setShopSettings, history) => {
 
     switch (response.status) {
       case 200:
-        const settings = await response.json();
-        /* setShopSettings(settings); */
-        setShopSettings({
-          tertiaryColor: "#000000",
-          secondaryColor: "#000000",
-          leadingColor: "#000000",
-          logo: "",
-          currency: "",
-        });
+        const settingsData = await response.json();
+        setShopSettings(settingsData);
         break;
       case 500:
         history.push("/500");
