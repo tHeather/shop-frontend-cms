@@ -3,15 +3,21 @@ import { useHistory } from "react-router";
 import { HandleUnauthorizedOrForbiddenError } from "../../../components/Errors/ErrorHandlers";
 import { JsonFetch } from "../../../components/fetches/Fetches";
 import Loader from "../../../components/loader/Loader";
-import { Modal } from "../../../components/Messages/Modal";
+import { InfoModal } from "../../../components/Messages/Modal";
 import { settings } from "../../../settings";
 import SaveCategory from "../SaveCategory/SaveCategory";
 
-const deleteCategory = async (id, setIsLoading, history, setIsDeleted) => {
+const deleteCategory = async (
+  id,
+  setIsLoading,
+  history,
+  setIsDeleted,
+  setIsCategoryNotFound
+) => {
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/category/${id}`,
+      `${settings.baseURL}/api/Category/${id}`,
       "DELETE",
       true,
       null
@@ -20,6 +26,10 @@ const deleteCategory = async (id, setIsLoading, history, setIsDeleted) => {
     switch (response.status) {
       case 204:
         setIsDeleted(true);
+        setIsLoading(false);
+        break;
+      case 404:
+        setIsCategoryNotFound(true);
         setIsLoading(false);
         break;
       case 401:
@@ -42,7 +52,7 @@ const getCategories = async (setIsLoading, setCategories, history) => {
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/category`,
+      `${settings.baseURL}/api/Category`,
       "GET",
       false,
       null
@@ -72,15 +82,16 @@ export const DisplayCategories = ({
   setIsLoading,
   history,
   setIsDeleted,
+  setIsCategoryNotFound,
 }) => {
   if (!Array.isArray(categories) || categories.length < 1)
     return <div>No categories here yet.</div>;
 
   return categories.map((category) => {
-    const { id, name, types } = category;
+    const { id, title, types } = category;
     return (
       <article key={id}>
-        <span>{name}</span>
+        <span>{title}</span>
         <ul>
           {types.map((type) => (
             <li key={type}>{type}</li>
@@ -89,7 +100,13 @@ export const DisplayCategories = ({
         <button onClick={() => setSelectedCategory(category)}>Edit</button>
         <button
           onClick={() =>
-            deleteCategory(id, setIsLoading, history, setIsDeleted)
+            deleteCategory(
+              id,
+              setIsLoading,
+              history,
+              setIsDeleted,
+              setIsCategoryNotFound
+            )
           }
         >
           Delete
@@ -99,52 +116,47 @@ export const DisplayCategories = ({
   });
 };
 
-const DeleteModal = ({
-  setIsDeleted,
-  setIsLoading,
-  setCategories,
-  history,
-}) => {
-  return (
-    <Modal>
-      <p>Successfully deleted</p>
-      <button
-        onClick={() => {
-          setIsDeleted(false);
-          getCategories(setIsLoading, setCategories, history);
-        }}
-      >
-        OK
-      </button>
-    </Modal>
-  );
-};
-
 export default function CategoryList() {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleted, setIsDeleted] = useState(false);
   const history = useHistory();
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isCategoryNotFound, setIsCategoryNotFound] = useState(false);
 
   useEffect(() => {
     getCategories(setIsLoading, setCategories, history);
   }, []);
 
+  if (isCategoryNotFound)
+    return (
+      <InfoModal
+        closeHandler={() => {
+          setIsCategoryNotFound(false);
+          getCategories(setIsLoading, setCategories, history);
+        }}
+        btnText="OK"
+      >
+        <p>Category not found.</p>
+      </InfoModal>
+    );
+
   if (isDeleted)
     return (
-      <DeleteModal
-        setIsDeleted={setIsDeleted}
-        setIsLoading={setIsLoading}
-        setCategories={setCategories}
-        history={history}
-      />
+      <InfoModal
+        closeHandler={() => {
+          setIsDeleted(false);
+          getCategories(setIsLoading, setCategories, history);
+        }}
+        btnText="OK"
+      >
+        <p>Successfully deleted</p>
+      </InfoModal>
     );
 
   if (isLoading) return <Loader />;
 
   if (selectedCategory) {
-    const { name, types } = selectedCategory;
     return (
       <>
         <button
@@ -155,14 +167,19 @@ export default function CategoryList() {
         >
           Back to list
         </button>
-        <SaveCategory initCategory={name} initCategoryTypes={types} />
+        <SaveCategory
+          initCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
       </>
     );
   }
 
   return (
     <>
-      <button onClick={() => setSelectedCategory({ name: "", types: null })}>
+      <button
+        onClick={() => setSelectedCategory({ id: null, name: "", types: [] })}
+      >
         Add new category
       </button>
       <DisplayCategories
@@ -172,6 +189,7 @@ export default function CategoryList() {
         setCategories={setCategories}
         history={history}
         setIsDeleted={setIsDeleted}
+        setIsCategoryNotFound={setIsCategoryNotFound}
       />
     </>
   );

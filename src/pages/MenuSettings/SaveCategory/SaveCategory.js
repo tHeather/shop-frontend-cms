@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { HandleUnauthorizedOrForbiddenError } from "../../../components/Errors/ErrorHandlers";
+import {
+  HandleErrorMessage,
+  HandleUnauthorizedOrForbiddenError,
+} from "../../../components/Errors/ErrorHandlers";
+import ErrorModal from "../../../components/Errors/ErrorModal";
 import { JsonFetch } from "../../../components/fetches/Fetches";
 import Loader from "../../../components/loader/Loader";
-import { Modal } from "../../../components/Messages/Modal";
+import { InfoModal } from "../../../components/Messages/Modal";
 import { settings } from "../../../settings";
 
 const getTypes = async (setIsLoading, setTypes, history, setSelectedType) => {
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/product/types`,
+      `${settings.baseURL}/api/Product/types`,
       "GET",
       false,
       null
@@ -40,17 +44,18 @@ const saveCategory = async (
   history,
   category,
   categoryTypes,
-  setIsSaved
+  setIsSaved,
+  setErrorsList
 ) => {
   if (!category || categoryTypes.size < 1) return;
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/category`,
+      `${settings.baseURL}/api/Category`,
       "POST",
       true,
       {
-        name: category,
+        title: category,
         types: Array.from(categoryTypes),
       }
     );
@@ -58,6 +63,60 @@ const saveCategory = async (
     switch (response.status) {
       case 204:
         setIsSaved(true);
+        setIsLoading(false);
+        break;
+      case 400:
+        HandleErrorMessage(response, setErrorsList, setIsLoading);
+        break;
+      case 401:
+      case 403:
+        HandleUnauthorizedOrForbiddenError(history);
+        break;
+      case 500:
+        history.push("/500");
+        break;
+      default:
+        console.log(response);
+        break;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const updateCategory = async (
+  setIsLoading,
+  history,
+  category,
+  categoryTypes,
+  setIsSaved,
+  categoryId,
+  setErrorsList,
+  setIsCategoryNotFound
+) => {
+  if (!category || categoryTypes.size < 1) return;
+  try {
+    setIsLoading(true);
+    const response = await JsonFetch(
+      `${settings.baseURL}/api/Category/${categoryId}`,
+      "PUT",
+      true,
+      {
+        title: category,
+        types: Array.from(categoryTypes),
+      }
+    );
+
+    switch (response.status) {
+      case 204:
+        setIsSaved(true);
+        setIsLoading(false);
+        break;
+      case 400:
+        HandleErrorMessage(response, setErrorsList, setIsLoading);
+        break;
+      case 404:
+        setIsCategoryNotFound(true);
         setIsLoading(false);
         break;
       case 401:
@@ -140,46 +199,55 @@ export const TypeList = ({
   );
 };
 
-const SavedModal = ({ setIsSaved }) => {
-  return (
-    <Modal>
-      <p>Category successfully saved.</p>
-      <button onClick={() => setIsSaved(false)}>OK</button>
-    </Modal>
-  );
-};
-
 export default function SaveCategory({
-  initCategoryTypes = null,
-  initCategory = "",
+  initCategory = null,
+  setSelectedCategory,
 }) {
   const [selectedType, setSelectedType] = useState(null);
   const [types, setTypes] = useState([]);
 
   const [categoryTypes, setCategoryTypes] = useState(
-    initCategoryTypes ? new Set([...initCategoryTypes]) : new Set()
+    new Set([...initCategory.types])
   );
-  const [category, setCategory] = useState(initCategory);
+  const [categoryTitle, setCategoryTitle] = useState(initCategory.title);
 
   const [isSaved, setIsSaved] = useState(false);
+  const [errorsList, setErrorsList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
+
+  const [isCategoryNotFound, setIsCategoryNotFound] = useState(false);
 
   useEffect(() => {
     getTypes(setIsLoading, setTypes, history, setSelectedType);
   }, []);
 
-  if (isSaved) return <SavedModal setIsSaved={setIsSaved} />;
+  if (isCategoryNotFound)
+    return (
+      <InfoModal closeHandler={() => setSelectedCategory(null)} btnText="OK">
+        <p>Category not found.</p>
+      </InfoModal>
+    );
+
+  if (isSaved)
+    return (
+      <InfoModal closeHandler={() => setIsSaved(false)} btnText="OK">
+        <p>Category successfully saved.</p>
+      </InfoModal>
+    );
   if (isLoading) return <Loader />;
 
   return (
     <>
+      {errorsList.length > 0 && (
+        <ErrorModal errorsArray={errorsList} clearErrors={setErrorsList} />
+      )}
       <label htmlFor="categoryName">Category name</label>
       <input
         id="categoryName"
         max="30"
-        onChange={({ target: { value } }) => setCategory(value)}
-        defaultValue={category}
+        onChange={({ target: { value } }) => setCategoryTitle(value)}
+        defaultValue={categoryTitle}
       />
       <SelectType types={types} setSelectedType={setSelectedType} />
       <button onClick={() => addTypeToCategory(selectedType, setCategoryTypes)}>
@@ -191,16 +259,28 @@ export default function SaveCategory({
         removeTypeFromCategory={removeTypeFromCategory}
       />
       <button
-        disabled={!category || categoryTypes.size < 1}
-        onClick={() =>
-          saveCategory(
-            setIsLoading,
-            history,
-            category,
-            categoryTypes,
-            setIsSaved
-          )
-        }
+        disabled={!categoryTitle || categoryTypes.size < 1}
+        onClick={() => {
+          initCategory.id
+            ? updateCategory(
+                setIsLoading,
+                history,
+                categoryTitle,
+                categoryTypes,
+                setIsSaved,
+                initCategory.id,
+                setErrorsList,
+                setIsCategoryNotFound
+              )
+            : saveCategory(
+                setIsLoading,
+                history,
+                categoryTitle,
+                categoryTypes,
+                setIsSaved,
+                setErrorsList
+              );
+        }}
       >
         Save
       </button>
