@@ -114,7 +114,7 @@ export default function ShopSettings() {
         }
       >
         {({ isValid }) => (
-          <Form>
+          <Form data-testid="shopSettingsForm">
             <StandardField
               name="leadingColor"
               label="Leading color"
@@ -131,7 +131,7 @@ export default function ShopSettings() {
               type="color"
             />
 
-            <SelectField name="currency" label="Currency">
+            <SelectField id="currency" name="currency" label="Currency">
               {CURRENCY.map((currency, index) => (
                 <option key={currency} value={index}>
                   {currency}
