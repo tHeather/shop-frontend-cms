@@ -200,14 +200,14 @@ export const TypeList = ({
 };
 
 export default function SaveCategory({
-  initCategory = null,
+  initCategory = { id: null, title: "", types: [] },
   setSelectedCategory,
 }) {
   const [selectedType, setSelectedType] = useState(null);
   const [types, setTypes] = useState([]);
 
   const [categoryTypes, setCategoryTypes] = useState(
-    new Set([...initCategory.types])
+    new Set(initCategory.types)
   );
   const [categoryTitle, setCategoryTitle] = useState(initCategory.title);
 
@@ -224,7 +224,10 @@ export default function SaveCategory({
 
   if (isCategoryNotFound)
     return (
-      <InfoModal closeHandler={() => setSelectedCategory(null)} btnText="OK">
+      <InfoModal
+        closeHandler={() => setSelectedCategory(null)}
+        btnText="Back to list"
+      >
         <p>Category not found.</p>
       </InfoModal>
     );

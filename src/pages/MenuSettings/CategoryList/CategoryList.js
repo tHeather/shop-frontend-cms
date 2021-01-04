@@ -177,11 +177,7 @@ export default function CategoryList() {
 
   return (
     <>
-      <button
-        onClick={() => setSelectedCategory({ id: null, name: "", types: [] })}
-      >
-        Add new category
-      </button>
+      <button onClick={setSelectedCategory}>Add new category</button>
       <DisplayCategories
         categories={categories}
         setSelectedCategory={setSelectedCategory}
