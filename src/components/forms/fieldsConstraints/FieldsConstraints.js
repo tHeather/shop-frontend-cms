@@ -50,6 +50,7 @@ const SUPPORTED_FORMATS = [
   "image/bmp",
   "image/gif",
   "image/png",
+  "image/svg",
 ];
 
 export const fileValidation = mixed()
@@ -58,7 +59,7 @@ export const fileValidation = mixed()
   )
   .test(
     "fileFormat",
-    "The accepted file formats are jpg, jpeg, bmp, gif, png.",
+    "The accepted file formats are jpg, jpeg, bmp, gif, png, svg.",
     (value) => (value ? SUPPORTED_FORMATS.includes(value.type) : true)
   );
 

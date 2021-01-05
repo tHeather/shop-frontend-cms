@@ -482,19 +482,19 @@ export default function SaveProduct({ productId = "", setSelectedProductId }) {
 
             <FileUploadField
               name="firstImage"
-              accept=".jpg, .jpeg, .png, .pdf"
+              accept="jpg, jpeg, bmp, gif, png, svg"
               label="First image of product, which is also thumbnail."
             />
 
             <FileUploadField
               name="secondImage"
-              accept=".jpg, .jpeg, .png, .pdf"
+              accept="jpg, jpeg, bmp, gif, png, svg"
               label="Second image of product."
             />
 
             <FileUploadField
               name="thirdImage"
-              accept=".jpg, .jpeg, .png, .pdf"
+              accept="jpg, jpeg, bmp, gif, png, svg"
               label="Third image of product."
             />
 
