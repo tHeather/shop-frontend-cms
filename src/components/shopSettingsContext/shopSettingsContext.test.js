@@ -21,6 +21,7 @@ describe("gestSettings (GET)", () => {
           leadingColor: "#334455",
           logo: "logo.png",
           currency: "PLN",
+          regulations: "regulations.pdf",
         }),
     });
 
@@ -40,6 +41,7 @@ describe("gestSettings (GET)", () => {
                       leadingColor: "#776655",
                       logo: "logo2.png",
                       currency: "EUR",
+                      regulations: "regulations2.pdf",
                     })
                   }
                 >
@@ -74,6 +76,7 @@ describe("gestSettings (GET)", () => {
       leadingColor: "#334455",
       logo: "logo.png",
       currency: "PLN",
+      regulations: "regulations.pdf",
     });
   });
 
@@ -88,6 +91,7 @@ describe("gestSettings (GET)", () => {
       leadingColor: "#776655",
       logo: "logo2.png",
       currency: "EUR",
+      regulations: "regulations2.pdf",
     });
   });
 });

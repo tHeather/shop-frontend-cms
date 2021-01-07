@@ -46,6 +46,7 @@ describe("shopSettings", () => {
       secondaryColor: "#223344",
       leadingColor: "#334455",
       logo: "",
+      regulations: "",
       currency: "0",
     });
   });
@@ -59,6 +60,7 @@ describe("shopSettings", () => {
           secondaryColor: "#223344",
           leadingColor: "#334455",
           logo: "",
+          regulations: "",
           currency: "5",
         }),
     });
@@ -81,6 +83,7 @@ describe("shopSettings", () => {
       secondaryColor: "#223344",
       leadingColor: "#334455",
       logo: "",
+      regulations: "",
       currency: "5",
     });
   });
@@ -93,6 +96,7 @@ describe("shopSettings", () => {
           tertiaryColor: "#112233",
           secondaryColor: "#223344",
           leadingColor: "#334455",
+          regulations: "",
           logo: "",
           currency: "5",
         }),
@@ -102,6 +106,7 @@ describe("shopSettings", () => {
       tertiaryColor: "#112233",
       secondaryColor: "#223344",
       leadingColor: "#334455",
+      regulations: "",
       logo: "",
       currency: "0",
     });
@@ -124,6 +129,7 @@ describe("shopSettings", () => {
       tertiaryColor: "#112233",
       secondaryColor: "#223344",
       leadingColor: "#334455",
+      regulations: "",
       logo: "",
       currency: "5",
     });
@@ -150,6 +156,7 @@ describe("shopSettings", () => {
       tertiaryColor: "#112233",
       secondaryColor: "#223344",
       leadingColor: "#334455",
+      regulations: "",
       logo: "",
       currency: "0",
     });

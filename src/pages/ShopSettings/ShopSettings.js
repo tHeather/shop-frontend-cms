@@ -16,6 +16,7 @@ import {
 import {
   colorConstraints,
   fileValidation,
+  textFileValidation,
 } from "../../components/forms/fieldsConstraints/FieldsConstraints";
 import Loader from "../../components/loader/Loader";
 import { InfoModal } from "../../components/Messages/Modal";
@@ -73,10 +74,11 @@ const validationSchema = object().shape({
   secondaryColor: colorConstraints,
   leadingColor: colorConstraints,
   logo: fileValidation,
+  regulations: textFileValidation,
 });
 
 export default function ShopSettings() {
-  const { logo, setShopSettings, ...settings } = useContext(
+  const { logo, regulations, setShopSettings, ...settings } = useContext(
     ShopSettingsContext
   );
 
@@ -101,7 +103,7 @@ export default function ShopSettings() {
       )}
       <Formik
         validationSchema={validationSchema}
-        initialValues={{ ...settings, logo: "" }}
+        initialValues={{ ...settings, logo: "", regulations: "" }}
         onSubmit={(settingsValues) =>
           updateSettings(
             setShopSettings,
@@ -145,6 +147,12 @@ export default function ShopSettings() {
               name="logo"
               accept=".jpg, .jpeg, .png, .pdf"
               label="Logo"
+            />
+
+            <FileUploadField
+              name="regulations"
+              accept=".doc .docx .pdf"
+              label="Regulations"
             />
 
             <button type="submit" disabled={!isValid}>

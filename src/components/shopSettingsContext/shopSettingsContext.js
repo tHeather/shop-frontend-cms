@@ -39,6 +39,7 @@ export default function ShopSettingsProvider({ children }) {
     leadingColor: "#000000",
     logo: "",
     currency: "",
+    regulations: "",
   });
 
   useEffect(() => {
