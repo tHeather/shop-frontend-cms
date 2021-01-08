@@ -33,6 +33,7 @@ const visualSettingsLinks = [
   { label: "Add Section", url: "/add-sections" },
   { label: "Shop settings", url: "/shop-settings" },
   { label: "Slider", url: "/slider" },
+  { label: "Footer settings", url: "/footer" },
 ];
 
 export default function Navigation() {

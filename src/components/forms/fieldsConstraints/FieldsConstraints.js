@@ -76,3 +76,26 @@ export const textFileValidation = mixed()
   );
 
 export const colorConstraints = string().required("This field is required.");
+
+export const timeRangeValidation = string()
+  .matches(
+    /^((?:[01]\d:[0-5][0-9]|2[0-3]:[0-5][0-9])(?:\s?)-(?:\s?)(?:[01]\d:[0-5][0-9]|2[0-3]:[0-5][0-9])(?:\s?,\s?)?)+$/,
+    "Correct format is hh:mm-hh:mm"
+  )
+  .max(11, "Maximum length is 11 characters.");
+
+export const phoneNumberValidation = string()
+  .matches(
+    /\(?([0-9]{3})\)?([ ,-]?)([0-9]{3})\2([0-9]{3})/,
+    "Correct format is 123-456-789 or 123 456 789"
+  )
+  .max(11, "Maximum length is 11 characters.");
+
+export const emailValidation = string()
+  .trim()
+  .email("Incorrect email address.")
+  .max(50, "The maximum length is 50 characters.");
+
+export const footerTextValidation = string()
+  .trim()
+  .max(250, "The maximum length is 250 characters.");

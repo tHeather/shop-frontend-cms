@@ -10,6 +10,7 @@ import SaveSection from "../../pages/Sections/SaveSection/SaveSection";
 import SaveProduct from "../../pages/Products/SaveProduct/SaveProduct";
 import ShopSettings from "../../pages/ShopSettings/ShopSettings";
 import SliderSettings from "../../pages/SliderSettings/SliderSettings";
+import FooterSettings from "../../pages/FooterSettings/FooterSettings";
 
 const PrivateRoute = ({ userEmail, children }) => {
   return userEmail ? children : <Redirect exact to="/" />;
@@ -61,6 +62,11 @@ export default function Routing() {
       <Route exact path="/slider">
         <PrivateRoute userEmail={userEmail}>
           <SliderSettings />
+        </PrivateRoute>
+      </Route>
+      <Route exact path="/footer">
+        <PrivateRoute userEmail={userEmail}>
+          <FooterSettings />
         </PrivateRoute>
       </Route>
       {/* Error */}
