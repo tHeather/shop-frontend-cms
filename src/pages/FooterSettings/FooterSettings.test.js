@@ -20,9 +20,9 @@ describe("Get data", () => {
       status: 200,
       json: () =>
         Promise.resolve({
-          monFriHours: "08:00-16:00",
-          satSunHours: "10:00-15:00",
-          telephone: "123-456-789",
+          weekWorkingHours: "08:00-16:00",
+          weekendWorkingHours: "10:00-15:00",
+          phoneNumber: "123-456-789",
           email: "test@test.com",
           text: "Some text in footer",
         }),
@@ -35,7 +35,9 @@ describe("Get data", () => {
     await waitForElementToBeRemoved(screen.getByTestId("loader"));
 
     expect(JsonFetch.mock.calls).toHaveLength(1);
-    expect(JsonFetch.mock.calls[0][0]).toBe(`${settings.baseURL}/api/footer`);
+    expect(JsonFetch.mock.calls[0][0]).toBe(
+      `${settings.baseURL}/api/FooterSettings`
+    );
     expect(JsonFetch.mock.calls[0][1]).toBe("GET");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);
     expect(JsonFetch.mock.calls[0][3]).toBe(null);
@@ -46,9 +48,9 @@ describe("Get data", () => {
       status: 200,
       json: () =>
         Promise.resolve({
-          monFriHours: "08:00-16:00",
-          satSunHours: "10:00-15:00",
-          telephone: "123-456-789",
+          weekWorkingHours: "08:00-16:00",
+          weekendWorkingHours: "10:00-15:00",
+          phoneNumber: "123-456-789",
           email: "test@test.com",
           text: "Some text in footer",
         }),
@@ -59,9 +61,9 @@ describe("Get data", () => {
     });
 
     expect(await screen.findByTestId("footerSettingsForm")).toHaveFormValues({
-      monFriHours: "08:00-16:00",
-      satSunHours: "10:00-15:00",
-      telephone: "123-456-789",
+      weekWorkingHours: "08:00-16:00",
+      weekendWorkingHours: "10:00-15:00",
+      phoneNumber: "123-456-789",
       email: "test@test.com",
       text: "Some text in footer",
     });
@@ -97,9 +99,9 @@ describe("Update data", () => {
       status: 200,
       json: () =>
         Promise.resolve({
-          monFriHours: "08:00-16:00",
-          satSunHours: "10:00-15:00",
-          telephone: "123-456-789",
+          weekWorkingHours: "08:00-16:00",
+          weekendWorkingHours: "10:00-15:00",
+          phoneNumber: "123-456-789",
           email: "test@test.com",
           text: "Some text in footer",
         }),
@@ -126,7 +128,7 @@ describe("Update data", () => {
 
   test("make request with correct parametrs (PUT)", async () => {
     JsonFetch.mockReturnValueOnce({
-      status: 201,
+      status: 200,
     });
 
     const emailInput = screen.getByLabelText("E-mail", { selector: "input" });
@@ -144,21 +146,23 @@ describe("Update data", () => {
     );
 
     expect(JsonFetch.mock.calls).toHaveLength(2);
-    expect(JsonFetch.mock.calls[1][0]).toBe(`${settings.baseURL}/api/footer`);
+    expect(JsonFetch.mock.calls[1][0]).toBe(
+      `${settings.baseURL}/api/FooterSettings`
+    );
     expect(JsonFetch.mock.calls[1][1]).toBe("PUT");
     expect(JsonFetch.mock.calls[1][2]).toBe(true);
     expect(JsonFetch.mock.calls[1][3]).toEqual({
-      monFriHours: "08:00-16:00",
-      satSunHours: "10:00-15:00",
-      telephone: "123-456-789",
+      weekWorkingHours: "08:00-16:00",
+      weekendWorkingHours: "10:00-15:00",
+      phoneNumber: "123-456-789",
       email: "newEmailAddress@test.com",
       text: "Some text in footer",
     });
   });
 
-  test("handle server response (PUT, 201)", async () => {
+  test("handle server response (PUT, 200)", async () => {
     JsonFetch.mockReturnValueOnce({
-      status: 201,
+      status: 200,
     });
 
     const emailInput = screen.getByLabelText("E-mail", { selector: "input" });
@@ -181,9 +185,9 @@ describe("Update data", () => {
     );
 
     expect(await screen.findByTestId("footerSettingsForm")).toHaveFormValues({
-      monFriHours: "08:00-16:00",
-      satSunHours: "10:00-15:00",
-      telephone: "123-456-789",
+      weekWorkingHours: "08:00-16:00",
+      weekendWorkingHours: "10:00-15:00",
+      phoneNumber: "123-456-789",
       email: "newEmailAddress@test.com",
       text: "Some text in footer",
     });
@@ -209,9 +213,9 @@ describe("Update data", () => {
     userEvent.click(screen.getByTestId("closeErrorBtn"));
 
     expect(await screen.findByTestId("footerSettingsForm")).toHaveFormValues({
-      monFriHours: "08:00-16:00",
-      satSunHours: "10:00-15:00",
-      telephone: "123-456-789",
+      weekWorkingHours: "08:00-16:00",
+      weekendWorkingHours: "10:00-15:00",
+      phoneNumber: "123-456-789",
       email: "newEmailAddress@test.com",
       text: "Some text in footer",
     });

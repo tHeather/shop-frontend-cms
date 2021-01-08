@@ -20,17 +20,17 @@ import { InfoModal } from "../../components/Messages/Modal";
 import { settings } from "../../settings";
 
 const validationSchema = object().shape({
-  MonFriHours: timeRangeValidation,
-  SatSunHours: timeRangeValidation,
-  telephone: phoneNumberValidation,
+  weekWorkingHours: timeRangeValidation,
+  weekendWorkingHours: timeRangeValidation,
+  phoneNumber: phoneNumberValidation,
   email: emailValidation,
   text: footerTextValidation,
 });
 
 const initialFormValues = {
-  monFriHours: "",
-  satSunHours: "",
-  telephone: "",
+  weekWorkingHours: "",
+  weekendWorkingHours: "",
+  phoneNumber: "",
   email: "",
   text: "",
 };
@@ -39,7 +39,7 @@ const getData = async (setFormValues, setIsLoading, history) => {
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/footer`,
+      `${settings.baseURL}/api/FooterSettings`,
       "GET",
       false,
       null
@@ -75,14 +75,14 @@ const updateData = async (
     setIsLoading(true);
 
     const response = await JsonFetch(
-      `${settings.baseURL}/api/footer`,
+      `${settings.baseURL}/api/FooterSettings`,
       "PUT",
       true,
       formValues
     );
 
     switch (response.status) {
-      case 201:
+      case 200:
         setFormValues(formValues);
         setIsDataSaved(true);
         setIsLoading(false);
@@ -151,19 +151,19 @@ export default function FooterSettings() {
         {({ isValid }) => (
           <Form data-testid="footerSettingsForm">
             <StandardField
-              name="monFriHours"
+              name="weekWorkingHours"
               label="Opening hours (Mon - Fri)"
               type="text"
             />
 
             <StandardField
-              name="satSunHours"
+              name="weekendWorkingHours"
               label="Opening hours  (Sat - Sun)"
               type="text"
             />
 
             <StandardField
-              name="telephone"
+              name="phoneNumber"
               label="Telephone number"
               type="text"
             />
