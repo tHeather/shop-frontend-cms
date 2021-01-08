@@ -87,7 +87,7 @@ test("EditProduct: make GET request with correct parameters", async () => {
 
   expect(JsonFetch.mock.calls.length).toBe(1);
   expect(JsonFetch.mock.calls[0][0]).toBe(
-    `${settings.baseURL}/api/Product/123`
+    `${settings.backendApiUrl}/api/Product/123`
   );
   expect(JsonFetch.mock.calls[0][1]).toBe("GET");
   expect(JsonFetch.mock.calls[0][2]).toBe(false);
@@ -142,7 +142,7 @@ test("EditProduct: handle server response (GET,status 200)", async () => {
 
   const firstImage = await screen.findAllByRole("img");
   expect(firstImage[0].getAttribute("src")).toBe(
-    `${settings.baseURL}/image1.jpg`
+    `${settings.backendApiUrl}/image1.jpg`
   );
 });
 

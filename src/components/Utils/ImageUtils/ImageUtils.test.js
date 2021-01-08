@@ -10,7 +10,9 @@ describe("DisplayImage", () => {
     });
 
     const img = screen.getByRole("img");
-    expect(img.getAttribute("src")).toBe(`${settings.baseURL}/testSource`);
+    expect(img.getAttribute("src")).toBe(
+      `${settings.backendApiUrl}/testSource`
+    );
     expect(img.getAttribute("alt")).toBe("Test image");
   });
 

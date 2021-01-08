@@ -14,7 +14,7 @@ const getTypes = async (setIsLoading, setTypes, history, setSelectedType) => {
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Product/types`,
+      `${settings.backendApiUrl}/api/Product/types`,
       "GET",
       false,
       null
@@ -51,7 +51,7 @@ const saveCategory = async (
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Category`,
+      `${settings.backendApiUrl}/api/Category`,
       "POST",
       true,
       {
@@ -98,7 +98,7 @@ const updateCategory = async (
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Category/${categoryId}`,
+      `${settings.backendApiUrl}/api/Category/${categoryId}`,
       "PUT",
       true,
       {

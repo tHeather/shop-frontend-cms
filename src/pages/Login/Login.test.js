@@ -94,7 +94,7 @@ describe("Login", () => {
 
     expect(JsonFetch.mock.calls).toHaveLength(1);
     expect(JsonFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/api/Auth/login`
+      `${settings.backendApiUrl}/api/Auth/login`
     );
     expect(JsonFetch.mock.calls[0][1]).toBe("POST");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);

@@ -24,7 +24,7 @@ const submitForm = async (
   setIsLoading(true);
   try {
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Auth/login`,
+      `${settings.backendApiUrl}/api/Auth/login`,
       "POST",
       false,
       {

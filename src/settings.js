@@ -1,3 +1,3 @@
 export const settings = {
-  baseURL: "https://localhost:44315",
+  backendApiUrl: "https://localhost:44315",
 };

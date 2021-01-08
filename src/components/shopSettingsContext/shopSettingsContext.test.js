@@ -61,7 +61,7 @@ describe("gestSettings (GET)", () => {
   test("make request with correct parameters (on mount)", async () => {
     expect(JsonFetch.mock.calls).toHaveLength(1);
     expect(JsonFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/api/ShopSettings`
+      `${settings.backendApiUrl}/api/ShopSettings`
     );
     expect(JsonFetch.mock.calls[0][1]).toBe("GET");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);

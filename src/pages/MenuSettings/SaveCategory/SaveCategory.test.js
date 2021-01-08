@@ -164,7 +164,7 @@ describe("getTypes (GET)", () => {
   test("make request with correct paramteres (GET)", async () => {
     expect(JsonFetch.mock.calls.length).toBe(1);
     expect(JsonFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/api/Product/types`
+      `${settings.backendApiUrl}/api/Product/types`
     );
     expect(JsonFetch.mock.calls[0][1]).toBe("GET");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);
@@ -233,7 +233,9 @@ describe("saveCategory (POST)", () => {
     ).toBeInTheDocument();
 
     expect(JsonFetch.mock.calls.length).toBe(2);
-    expect(JsonFetch.mock.calls[1][0]).toBe(`${settings.baseURL}/api/Category`);
+    expect(JsonFetch.mock.calls[1][0]).toBe(
+      `${settings.backendApiUrl}/api/Category`
+    );
     expect(JsonFetch.mock.calls[1][1]).toBe("POST");
     expect(JsonFetch.mock.calls[1][2]).toBe(true);
     expect(JsonFetch.mock.calls[1][3]).toEqual({
@@ -401,7 +403,7 @@ describe("updateCategory (PUT)", () => {
 
     expect(JsonFetch.mock.calls.length).toBe(2);
     expect(JsonFetch.mock.calls[1][0]).toBe(
-      `${settings.baseURL}/api/Category/123`
+      `${settings.backendApiUrl}/api/Category/123`
     );
     expect(JsonFetch.mock.calls[1][1]).toBe("PUT");
     expect(JsonFetch.mock.calls[1][2]).toBe(true);

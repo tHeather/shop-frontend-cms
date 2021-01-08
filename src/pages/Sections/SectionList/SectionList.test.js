@@ -102,7 +102,7 @@ describe("SectionList", () => {
   test("make request with correct parameters (GET)", async () => {
     expect(JsonFetch.mock.calls.length).toBe(1);
     expect(JsonFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/api/Section/names`
+      `${settings.backendApiUrl}/api/Section/names`
     );
     expect(JsonFetch.mock.calls[0][1]).toBe("GET");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);
@@ -128,7 +128,7 @@ describe("SectionList", () => {
 
     expect(JsonFetch.mock.calls.length).toBe(2);
     expect(JsonFetch.mock.calls[1][0]).toBe(
-      `${settings.baseURL}/api/Section/1`
+      `${settings.backendApiUrl}/api/Section/1`
     );
     expect(JsonFetch.mock.calls[1][1]).toBe("DELETE");
     expect(JsonFetch.mock.calls[1][2]).toBe(true);

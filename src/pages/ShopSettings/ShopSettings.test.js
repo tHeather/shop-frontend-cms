@@ -75,7 +75,7 @@ describe("shopSettings", () => {
 
     expect(FormDataFetch.mock.calls).toHaveLength(1);
     expect(FormDataFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/api/ShopSettings`
+      `${settings.backendApiUrl}/api/ShopSettings`
     );
     expect(FormDataFetch.mock.calls[0][1]).toBe("PUT");
     expect(Object.fromEntries(FormDataFetch.mock.calls[0][2])).toEqual({

@@ -36,7 +36,7 @@ const getImages = async (setFormValues, setIsLoading, history) => {
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Slider`,
+      `${settings.backendApiUrl}/api/Slider`,
       "GET",
       false,
       null
@@ -72,7 +72,7 @@ const updateImages = async (
     setIsLoading(true);
 
     const response = await FormDataFetch(
-      `${settings.baseURL}/api/Slider`,
+      `${settings.backendApiUrl}/api/Slider`,
       "PUT",
       MakeFormData(formValues)
     );

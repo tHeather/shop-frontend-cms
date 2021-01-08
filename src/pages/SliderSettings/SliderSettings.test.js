@@ -48,7 +48,9 @@ describe("getImages", () => {
     await waitForElementToBeRemoved(() => screen.getByTestId("loader"));
 
     expect(JsonFetch.mock.calls).toHaveLength(1);
-    expect(JsonFetch.mock.calls[0][0]).toBe(`${settings.baseURL}/api/Slider`);
+    expect(JsonFetch.mock.calls[0][0]).toBe(
+      `${settings.backendApiUrl}/api/Slider`
+    );
     expect(JsonFetch.mock.calls[0][1]).toBe("GET");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);
     expect(JsonFetch.mock.calls[0][3]).toBe(null);
@@ -77,7 +79,7 @@ describe("getImages", () => {
 
     imgs.forEach((img, index) =>
       expect(img.getAttribute("src")).toBe(
-        `${settings.baseURL}/slide${index}.png`
+        `${settings.backendApiUrl}/slide${index}.png`
       )
     );
   });
@@ -189,7 +191,7 @@ describe("updateImages (PUT)", () => {
 
     expect(FormDataFetch.mock.calls).toHaveLength(1);
     expect(FormDataFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/api/Slider`
+      `${settings.backendApiUrl}/api/Slider`
     );
     expect(FormDataFetch.mock.calls[0][1]).toBe("PUT");
     const payload = Object.fromEntries(FormDataFetch.mock.calls[0][2]);
@@ -231,7 +233,7 @@ describe("updateImages (PUT)", () => {
     userEvent.click(screen.getByText("OK"));
 
     expect(screen.getAllByRole("img")[0].getAttribute("src")).toBe(
-      `${settings.baseURL}/slide0.png`
+      `${settings.backendApiUrl}/slide0.png`
     );
   });
 

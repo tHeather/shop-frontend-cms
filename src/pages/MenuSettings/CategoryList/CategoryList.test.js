@@ -111,7 +111,9 @@ describe("getCategories (GET)", () => {
 
   test("make request with corretly parameters (GET)", async () => {
     expect(JsonFetch.mock.calls.length).toBe(1);
-    expect(JsonFetch.mock.calls[0][0]).toBe(`${settings.baseURL}/api/Category`);
+    expect(JsonFetch.mock.calls[0][0]).toBe(
+      `${settings.backendApiUrl}/api/Category`
+    );
     expect(JsonFetch.mock.calls[0][1]).toBe("GET");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);
   });
@@ -200,7 +202,7 @@ describe("deleteCategories (DELETE)", () => {
 
     expect(JsonFetch.mock.calls.length).toBe(2);
     expect(JsonFetch.mock.calls[1][0]).toBe(
-      `${settings.baseURL}/api/Category/1`
+      `${settings.backendApiUrl}/api/Category/1`
     );
     expect(JsonFetch.mock.calls[1][1]).toBe("DELETE");
     expect(JsonFetch.mock.calls[1][2]).toBe(true);

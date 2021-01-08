@@ -22,7 +22,7 @@ const getProducts = async (
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Product?${MakeQueryString(searchParams)}`,
+      `${settings.backendApiUrl}/api/Product?${MakeQueryString(searchParams)}`,
       "GET",
       false,
       null

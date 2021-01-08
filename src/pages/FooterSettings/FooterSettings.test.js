@@ -36,7 +36,7 @@ describe("Get data", () => {
 
     expect(JsonFetch.mock.calls).toHaveLength(1);
     expect(JsonFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/api/FooterSettings`
+      `${settings.backendApiUrl}/api/FooterSettings`
     );
     expect(JsonFetch.mock.calls[0][1]).toBe("GET");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);
@@ -147,7 +147,7 @@ describe("Update data", () => {
 
     expect(JsonFetch.mock.calls).toHaveLength(2);
     expect(JsonFetch.mock.calls[1][0]).toBe(
-      `${settings.baseURL}/api/FooterSettings`
+      `${settings.backendApiUrl}/api/FooterSettings`
     );
     expect(JsonFetch.mock.calls[1][1]).toBe("PUT");
     expect(JsonFetch.mock.calls[1][2]).toBe(true);

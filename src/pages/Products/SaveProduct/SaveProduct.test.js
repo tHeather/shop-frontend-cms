@@ -122,7 +122,7 @@ describe("Save product", () => {
 
     expect(FormDataFetch.mock.calls).toHaveLength(1);
     expect(FormDataFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/api/Product`
+      `${settings.backendApiUrl}/api/Product`
     );
     expect(FormDataFetch.mock.calls[0][1]).toBe("POST");
     expect(Object.fromEntries(FormDataFetch.mock.calls[0][2])).toEqual({
@@ -283,7 +283,7 @@ describe("Get product", () => {
     );
     expect(JsonFetch.mock.calls).toHaveLength(1);
     expect(JsonFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/api/Product/123`
+      `${settings.backendApiUrl}/api/Product/123`
     );
     expect(JsonFetch.mock.calls[0][1]).toBe("GET");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);
@@ -478,7 +478,7 @@ describe("Update product", () => {
 
     expect(FormDataFetch.mock.calls).toHaveLength(1);
     expect(FormDataFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/api/Product/123`
+      `${settings.backendApiUrl}/api/Product/123`
     );
     expect(FormDataFetch.mock.calls[0][1]).toBe("PUT");
     expect(Object.fromEntries(FormDataFetch.mock.calls[0][2])).toEqual({
@@ -680,7 +680,7 @@ describe("delete image", () => {
 
     expect(JsonFetch.mock.calls).toHaveLength(2);
     expect(JsonFetch.mock.calls[1][0]).toBe(
-      `${settings.baseURL}/api/Product/123/images/firstImage.png`
+      `${settings.backendApiUrl}/api/Product/123/images/firstImage.png`
     );
     expect(JsonFetch.mock.calls[1][1]).toBe("DELETE");
     expect(JsonFetch.mock.calls[1][2]).toBe(true);
@@ -693,15 +693,15 @@ describe("delete image", () => {
     });
 
     expect(screen.getAllByRole("img")[0].getAttribute("src")).toBe(
-      `${settings.baseURL}/firstImage.png`
+      `${settings.backendApiUrl}/firstImage.png`
     );
 
     expect(screen.getAllByRole("img")[1].getAttribute("src")).toBe(
-      `${settings.baseURL}/secondImage.png`
+      `${settings.backendApiUrl}/secondImage.png`
     );
 
     expect(screen.getAllByRole("img")[2].getAttribute("src")).toBe(
-      `${settings.baseURL}/thirdImage.png`
+      `${settings.backendApiUrl}/thirdImage.png`
     );
 
     userEvent.click(screen.getByTestId("deleteFirstImageBtn"));
@@ -717,11 +717,11 @@ describe("delete image", () => {
     );
 
     expect(screen.getAllByRole("img")[1].getAttribute("src")).toBe(
-      `${settings.baseURL}/secondImage.png`
+      `${settings.backendApiUrl}/secondImage.png`
     );
 
     expect(screen.getAllByRole("img")[2].getAttribute("src")).toBe(
-      `${settings.baseURL}/thirdImage.png`
+      `${settings.backendApiUrl}/thirdImage.png`
     );
   });
 
@@ -731,15 +731,15 @@ describe("delete image", () => {
     });
 
     expect(screen.getAllByRole("img")[0].getAttribute("src")).toBe(
-      `${settings.baseURL}/firstImage.png`
+      `${settings.backendApiUrl}/firstImage.png`
     );
 
     expect(screen.getAllByRole("img")[1].getAttribute("src")).toBe(
-      `${settings.baseURL}/secondImage.png`
+      `${settings.backendApiUrl}/secondImage.png`
     );
 
     expect(screen.getAllByRole("img")[2].getAttribute("src")).toBe(
-      `${settings.baseURL}/thirdImage.png`
+      `${settings.backendApiUrl}/thirdImage.png`
     );
 
     userEvent.click(screen.getByTestId("deleteFirstImageBtn"));
@@ -753,11 +753,11 @@ describe("delete image", () => {
     );
 
     expect(screen.getAllByRole("img")[1].getAttribute("src")).toBe(
-      `${settings.baseURL}/secondImage.png`
+      `${settings.backendApiUrl}/secondImage.png`
     );
 
     expect(screen.getAllByRole("img")[2].getAttribute("src")).toBe(
-      `${settings.baseURL}/thirdImage.png`
+      `${settings.backendApiUrl}/thirdImage.png`
     );
   });
 

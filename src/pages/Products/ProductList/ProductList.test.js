@@ -210,7 +210,7 @@ describe("ProductList", () => {
 
     expect(JsonFetch.mock.calls).toHaveLength(6);
     expect(JsonFetch.mock.calls[5][0]).toBe(
-      `${settings.baseURL}/api/Product?pageNumber=2&${filterType.type}=Laptop&${filterType.isOnDiscount}=true&sortType=${sortType.nameDescending}&search=Mackbook`
+      `${settings.backendApiUrl}/api/Product?pageNumber=2&${filterType.type}=Laptop&${filterType.isOnDiscount}=true&sortType=${sortType.nameDescending}&search=Mackbook`
     );
     expect(JsonFetch.mock.calls[5][1]).toBe("GET");
     expect(JsonFetch.mock.calls[5][2]).toBe(false);
@@ -259,14 +259,16 @@ describe("ProductList", () => {
 
     const mackbookImage = await screen.findByAltText("Mackbook");
     expect(mackbookImage.getAttribute("src")).toBe(
-      `${settings.baseURL}/imageMacbook.jpg`
+      `${settings.backendApiUrl}/imageMacbook.jpg`
     );
     expect(await screen.findByText("Mackbook")).toBeInTheDocument();
     expect(await screen.findByText("10000")).toBeInTheDocument();
     expect(await screen.findByText("9500")).toBeInTheDocument();
 
     const hpImage = await screen.findByAltText("HP");
-    expect(hpImage.getAttribute("src")).toBe(`${settings.baseURL}/imageHP.jpg`);
+    expect(hpImage.getAttribute("src")).toBe(
+      `${settings.backendApiUrl}/imageHP.jpg`
+    );
     expect(await screen.findByText("HP")).toBeInTheDocument();
     expect(await screen.findByText("5000")).toBeInTheDocument();
     expect(screen.queryByText("4500")).not.toBeInTheDocument();

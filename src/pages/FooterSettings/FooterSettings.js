@@ -39,7 +39,7 @@ const getData = async (setFormValues, setIsLoading, history) => {
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/FooterSettings`,
+      `${settings.backendApiUrl}/api/FooterSettings`,
       "GET",
       false,
       null
@@ -75,7 +75,7 @@ const updateData = async (
     setIsLoading(true);
 
     const response = await JsonFetch(
-      `${settings.baseURL}/api/FooterSettings`,
+      `${settings.backendApiUrl}/api/FooterSettings`,
       "PUT",
       true,
       formValues

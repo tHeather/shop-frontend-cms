@@ -38,7 +38,7 @@ const updateSettings = async (
     setIsLoading(true);
 
     const response = await FormDataFetch(
-      `${settings.baseURL}/api/ShopSettings`,
+      `${settings.backendApiUrl}/api/ShopSettings`,
       "PUT",
       MakeFormData(settingsValues)
     );

@@ -17,7 +17,7 @@ const deleteProduct = async (
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Product/${productId}`,
+      `${settings.backendApiUrl}/api/Product/${productId}`,
       "DELETE",
       true,
       null

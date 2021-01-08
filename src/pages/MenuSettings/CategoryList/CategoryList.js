@@ -17,7 +17,7 @@ const deleteCategory = async (
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Category/${id}`,
+      `${settings.backendApiUrl}/api/Category/${id}`,
       "DELETE",
       true,
       null
@@ -52,7 +52,7 @@ const getCategories = async (setIsLoading, setCategories, history) => {
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Category`,
+      `${settings.backendApiUrl}/api/Category`,
       "GET",
       false,
       null

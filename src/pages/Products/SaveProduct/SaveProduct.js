@@ -54,7 +54,7 @@ const updateProduct = async (
     };
 
     const response = await FormDataFetch(
-      `${settings.baseURL}/api/Product/${productId}`,
+      `${settings.backendApiUrl}/api/Product/${productId}`,
       "PUT",
       MakeFormData(productData)
     );
@@ -112,7 +112,7 @@ const saveProduct = async (
     } = formValues;
 
     const response = await FormDataFetch(
-      `${settings.baseURL}/api/Product`,
+      `${settings.backendApiUrl}/api/Product`,
       "POST",
       MakeFormData(productData)
     );
@@ -159,7 +159,7 @@ const getProduct = async (
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Product/${productId}`,
+      `${settings.backendApiUrl}/api/Product/${productId}`,
       "GET",
       false,
       null
@@ -214,7 +214,7 @@ const deleteImage = async (
     setIsLoading(true);
 
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Product/${productId}/images/${image.name}`,
+      `${settings.backendApiUrl}/api/Product/${productId}/images/${image.name}`,
       "DELETE",
       true,
       null

@@ -20,7 +20,7 @@ const getProducts = async (
     setIsLoading(true);
     const searchParam = search ? `&search=${search}` : "";
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Product?pageNumber=${pageNumber}${searchParam}`,
+      `${settings.backendApiUrl}/api/Product?pageNumber=${pageNumber}${searchParam}`,
       "GET",
       false,
       null
@@ -55,7 +55,7 @@ const getSection = async (
   try {
     setIsLoading(true);
     const response = await JsonFetch(
-      `${settings.baseURL}/api/Section/${sectionId}`,
+      `${settings.backendApiUrl}/api/Section/${sectionId}`,
       "GET",
       false,
       null
@@ -98,7 +98,7 @@ const saveSection = async (
   try {
     setIsLoading(true);
 
-    const url = `${settings.baseURL}/api/Section${
+    const url = `${settings.backendApiUrl}/api/Section${
       sectionId ? `/${sectionId}` : ""
     }`;
     const method = sectionId ? "PUT" : "POST";

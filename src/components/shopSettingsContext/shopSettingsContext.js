@@ -6,7 +6,7 @@ import { JsonFetch } from "../fetches/Fetches";
 const getSettings = async (setShopSettings, history) => {
   try {
     const response = await JsonFetch(
-      `${settings.baseURL}/api/ShopSettings`,
+      `${settings.backendApiUrl}/api/ShopSettings`,
       "GET",
       false,
       null

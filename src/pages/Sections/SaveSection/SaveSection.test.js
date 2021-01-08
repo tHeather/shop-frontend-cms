@@ -90,7 +90,7 @@ describe("SaveSection: Save mode", () => {
       await waitForElementToBeRemoved(() => screen.getByTestId("loader"));
       expect(JsonFetch.mock.calls.length).toBe(2);
       expect(JsonFetch.mock.calls[1][0]).toBe(
-        `${settings.baseURL}/api/Section`
+        `${settings.backendApiUrl}/api/Section`
       );
       expect(JsonFetch.mock.calls[1][1]).toBe("POST");
       expect(JsonFetch.mock.calls[1][2]).toBe(true);
@@ -191,7 +191,7 @@ describe("GetProducts (GET)", () => {
   test("make request with correct parameters (on mount)", async () => {
     expect(JsonFetch.mock.calls.length).toBe(1);
     expect(JsonFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/api/Product?pageNumber=1`
+      `${settings.backendApiUrl}/api/Product?pageNumber=1`
     );
     expect(JsonFetch.mock.calls[0][1]).toBe("GET");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);
@@ -221,7 +221,7 @@ describe("GetProducts (GET)", () => {
     await waitForElementToBeRemoved(() => screen.getByTestId("loader"));
     expect(JsonFetch.mock.calls.length).toBe(2);
     expect(JsonFetch.mock.calls[1][0]).toBe(
-      `${settings.baseURL}/api/Product?pageNumber=2`
+      `${settings.backendApiUrl}/api/Product?pageNumber=2`
     );
     expect(JsonFetch.mock.calls[1][1]).toBe("GET");
     expect(JsonFetch.mock.calls[1][2]).toBe(false);
@@ -255,7 +255,7 @@ describe("GetProducts (GET)", () => {
     await waitForElementToBeRemoved(() => screen.getByTestId("loader"));
     expect(JsonFetch.mock.calls.length).toBe(2);
     expect(JsonFetch.mock.calls[1][0]).toBe(
-      `${settings.baseURL}/api/Product?pageNumber=1&search=Mackbook`
+      `${settings.backendApiUrl}/api/Product?pageNumber=1&search=Mackbook`
     );
     expect(JsonFetch.mock.calls[1][1]).toBe("GET");
     expect(JsonFetch.mock.calls[1][2]).toBe(false);
@@ -265,7 +265,7 @@ describe("GetProducts (GET)", () => {
   test("handle server response (GET, 200)", async () => {
     const image = await screen.findByAltText("Mackbook");
     expect(image.getAttribute("src")).toBe(
-      `${settings.baseURL}/imageMacbook.jpg`
+      `${settings.backendApiUrl}/imageMacbook.jpg`
     );
     expect(await screen.findByText("Mackbook")).toBeInTheDocument();
     expect(await screen.findByText("10000")).toBeInTheDocument();
@@ -377,7 +377,7 @@ describe("SaveProduct: update mode", () => {
 
     const image = await screen.findByAltText("Mackbook");
     expect(image.getAttribute("src")).toBe(
-      `${settings.baseURL}/imageMacbook.jpg`
+      `${settings.backendApiUrl}/imageMacbook.jpg`
     );
     expect(await screen.findByText("Mackbook")).toBeInTheDocument();
     expect(await screen.findByText("10000")).toBeInTheDocument();
@@ -387,7 +387,7 @@ describe("SaveProduct: update mode", () => {
   test("make request with correct parameters (saveSection, GET)", async () => {
     expect(JsonFetch.mock.calls.length).toBe(2);
     expect(JsonFetch.mock.calls[0][0]).toBe(
-      `${settings.baseURL}/api/Section/12345`
+      `${settings.backendApiUrl}/api/Section/12345`
     );
     expect(JsonFetch.mock.calls[0][1]).toBe("GET");
     expect(JsonFetch.mock.calls[0][2]).toBe(false);
@@ -497,7 +497,7 @@ describe("SaveProduct: update mode", () => {
 
       expect(JsonFetch.mock.calls).toHaveLength(3);
       expect(JsonFetch.mock.calls[2][0]).toBe(
-        `${settings.baseURL}/api/Section/12345`
+        `${settings.backendApiUrl}/api/Section/12345`
       );
       expect(JsonFetch.mock.calls[2][1]).toBe("PUT");
       expect(JsonFetch.mock.calls[2][2]).toBe(true);
