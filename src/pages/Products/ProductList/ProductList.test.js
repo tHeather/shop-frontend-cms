@@ -7,7 +7,10 @@ import ProductList, {
   ProductSortSelect,
   ProductTypeFilters,
 } from "./ProductList";
-import { filterType, sortType } from "../../../components/constants/constants";
+import {
+  FILTER_TYPE,
+  SORT_TYPES,
+} from "../../../components/constants/constants";
 import { JsonFetch } from "../../../components/fetches/Fetches";
 import { settings } from "../../../settings";
 import { MemoryRouter, Route } from "react-router";
@@ -21,7 +24,7 @@ describe("ProductSortSelect", () => {
       render(
         <ProductSortSelect
           handleChange={mockedHandleChange}
-          defaultValue={sortType.quantityAscending}
+          defaultValue={SORT_TYPES.quantityAscending}
         />
       );
     });
@@ -30,12 +33,12 @@ describe("ProductSortSelect", () => {
   test("set default value", () => {
     expect(
       screen.getByLabelText("Sort by:", { selector: "select" }).value
-    ).toBe(sortType.quantityAscending.toString());
+    ).toBe(SORT_TYPES.quantityAscending.toString());
   });
 
   test("fire handleChange on select", () => {
     const select = screen.getByLabelText("Sort by:", { selector: "select" });
-    const nameDescending = sortType.nameDescending.toString();
+    const nameDescending = SORT_TYPES.nameDescending.toString();
     userEvent.selectOptions(select, nameDescending);
     expect(select.value).toBe(nameDescending);
     expect(mockedHandleChange.mock.calls).toHaveLength(1);
@@ -195,7 +198,7 @@ describe("ProductList", () => {
 
     userEvent.selectOptions(
       screen.getByLabelText("Sort by:", { selector: "select" }),
-      [sortType.nameDescending].toString()
+      [SORT_TYPES.nameDescending].toString()
     );
 
     userEvent.type(
@@ -210,7 +213,7 @@ describe("ProductList", () => {
 
     expect(JsonFetch.mock.calls).toHaveLength(6);
     expect(JsonFetch.mock.calls[5][0]).toBe(
-      `${settings.backendApiUrl}/api/Product?pageNumber=2&${filterType.type}=Laptop&${filterType.isOnDiscount}=true&sortType=${sortType.nameDescending}&search=Mackbook`
+      `${settings.backendApiUrl}/api/Product?pageNumber=2&${FILTER_TYPE.type}=Laptop&${FILTER_TYPE.isOnDiscount}=true&sortType=${SORT_TYPES.nameDescending}&search=Mackbook`
     );
     expect(JsonFetch.mock.calls[5][1]).toBe("GET");
     expect(JsonFetch.mock.calls[5][2]).toBe(false);
