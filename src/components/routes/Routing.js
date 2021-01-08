@@ -19,10 +19,14 @@ const PrivateRoute = ({ userEmail, children }) => {
 export default function Routing() {
   const { userEmail } = useContext(AuthContext);
 
+  if (sessionStorage.getItem("email") && !userEmail) return null;
+
   return (
     <Switch>
       {/* Public */}
-      <Route exact path="/" component={() => <Login />} />
+      <Route exact path="/">
+        <Login />
+      </Route>
       {/* Private */}
       <Route exact path="/orders">
         <PrivateRoute userEmail={userEmail}>
