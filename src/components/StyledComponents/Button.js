@@ -4,7 +4,7 @@ import { lighten, readableColor } from "polished";
 export const StyledButton = styled.button`
   font-weight: bold;
   border-radius: 10px;
-  padding: 0.3rem 0.6rem;
+  padding: 0.4rem 0.7rem;
   background-color: ${({ theme: { leadingColor } }) => leadingColor};
   color: ${({ theme: { leadingColor } }) => readableColor(leadingColor)};
   cursor: pointer;

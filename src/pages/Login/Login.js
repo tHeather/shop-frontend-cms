@@ -6,7 +6,9 @@ import ErrorModal from "../../components/Errors/ErrorModal";
 import { JsonFetch } from "../../components/fetches/Fetches";
 import Loader from "../../components/loader/Loader";
 import { StyledButton } from "../../components/StyledComponents/Button";
+import { StyledInput } from "../../components/StyledComponents/Input";
 import { settings } from "../../settings";
+import { StyledLoginPageForm } from "./LoginStyles";
 
 const submitForm = async (
   password,
@@ -73,16 +75,16 @@ export default function Login() {
       {isLoading ? (
         <Loader />
       ) : (
-        <form>
+        <StyledLoginPageForm>
           <label htmlFor="email">E-mail</label>
-          <input
+          <StyledInput
             type="text"
             id="email"
             onChange={({ target: { value } }) => setEmail(value)}
             defaultValue={email}
           />
           <label htmlFor="password">Password</label>
-          <input
+          <StyledInput
             type="password"
             id="password"
             onChange={({ target: { value } }) => setPassword(value)}
@@ -105,7 +107,7 @@ export default function Login() {
           >
             Log in
           </StyledButton>
-        </form>
+        </StyledLoginPageForm>
       )}
     </>
   );
