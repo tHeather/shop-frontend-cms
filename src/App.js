@@ -1,16 +1,14 @@
 import { BrowserRouter } from "react-router-dom";
 import AuthProvider from "./components/auth/AuthContext";
-import Navigation from "./components/Navigation/Navigation";
-import Routing from "./components/routes/Routing";
 import ShopSettingsProvider from "./components/shopSettingsContext/shopSettingsContext";
+import Layout from "./components/StyledComponents/GlobalStyles";
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <ShopSettingsProvider>
-          <Navigation />
-          <Routing />
+          <Layout />
         </ShopSettingsProvider>
       </BrowserRouter>
     </AuthProvider>

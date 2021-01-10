@@ -5,6 +5,7 @@ import { HandleErrorMessage } from "../../components/Errors/ErrorHandlers";
 import ErrorModal from "../../components/Errors/ErrorModal";
 import { JsonFetch } from "../../components/fetches/Fetches";
 import Loader from "../../components/loader/Loader";
+import { StyledButton } from "../../components/StyledComponents/Button";
 import { settings } from "../../settings";
 
 const submitForm = async (
@@ -88,7 +89,7 @@ export default function Login() {
             defaultValue={password}
           />
           {!isFormValidated && "E-mail and password are required."}
-          <button
+          <StyledButton
             onClick={(e) => {
               e.preventDefault();
               submitForm(
@@ -103,7 +104,7 @@ export default function Login() {
             }}
           >
             Log in
-          </button>
+          </StyledButton>
         </form>
       )}
     </>
