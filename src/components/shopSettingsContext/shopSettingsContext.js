@@ -2,8 +2,10 @@ import React, { createContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { settings } from "../../settings";
 import { JsonFetch } from "../fetches/Fetches";
+import Loader from "../loader/Loader";
 
-const getSettings = async (setShopSettings, history) => {
+const getSettings = async (setShopSettings, history, setIsLoading) => {
+  setIsLoading(true);
   try {
     const response = await JsonFetch(
       `${settings.backendApiUrl}/api/ShopSettings`,
@@ -16,6 +18,7 @@ const getSettings = async (setShopSettings, history) => {
       case 200:
         const settingsData = await response.json();
         setShopSettings(settingsData);
+        setIsLoading(false);
         break;
       case 500:
         history.push("/500");
@@ -42,9 +45,13 @@ export default function ShopSettingsProvider({ children }) {
     regulations: "",
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    getSettings(setShopSettings, history);
+    getSettings(setShopSettings, history, setIsLoading);
   }, []);
+
+  if (isLoading) return <Loader />;
 
   return (
     <ShopSettingsContext.Provider value={{ ...shopSettings, setShopSettings }}>

@@ -69,8 +69,8 @@ describe("gestSettings (GET)", () => {
   });
 
   test("add fetched data to context", async () => {
-    expect(valueChecker.mock.calls).toHaveLength(2);
-    expect(valueChecker.mock.calls[1][0]).toEqual({
+    expect(valueChecker.mock.calls).toHaveLength(1);
+    expect(valueChecker.mock.calls[0][0]).toEqual({
       tertiaryColor: "#112233",
       secondaryColor: "#223344",
       leadingColor: "#334455",
@@ -84,8 +84,8 @@ describe("gestSettings (GET)", () => {
     const setDataBtn = screen.getByTestId("setDataBtn");
     userEvent.click(setDataBtn);
     await waitFor(() => expect(setDataBtn).toBeInTheDocument());
-    expect(valueChecker.mock.calls).toHaveLength(3);
-    expect(valueChecker.mock.calls[2][0]).toEqual({
+    expect(valueChecker.mock.calls).toHaveLength(2);
+    expect(valueChecker.mock.calls[1][0]).toEqual({
       tertiaryColor: "#998877",
       secondaryColor: "#887766",
       leadingColor: "#776655",
