@@ -38,8 +38,8 @@ export default function ShopSettingsProvider({ children }) {
   const history = useHistory();
   const [shopSettings, setShopSettings] = useState({
     tertiaryColor: "#000000",
-    secondaryColor: "#000000",
-    leadingColor: "#000000",
+    secondaryColor: "#f1f1f1",
+    leadingColor: "#02d463",
     logo: "",
     currency: "",
     regulations: "",

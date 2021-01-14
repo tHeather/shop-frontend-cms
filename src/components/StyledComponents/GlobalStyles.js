@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
+import { AuthContext } from "../auth/AuthContext";
 import Navigation from "../Navigation/Navigation";
 import Routing from "../routes/Routing";
 import { ShopSettingsContext } from "../shopSettingsContext/shopSettingsContext";
@@ -16,6 +17,7 @@ body{
 `;
 
 const StyledMain = styled.main`
+  margin-top: ${({ isLoggedIn }) => (isLoggedIn ? "50px" : 0)};
   display: flex;
   min-height: 100vh;
   background-image: linear-gradient(
@@ -58,6 +60,7 @@ const StyledMain = styled.main`
 `;
 
 export default function Layout() {
+  const { userEmail } = useContext(AuthContext);
   const { logo, currency, regulations, ...colors } = useContext(
     ShopSettingsContext
   );
@@ -66,7 +69,7 @@ export default function Layout() {
     <ThemeProvider theme={colors}>
       <GlobalStyles />
       <Navigation />
-      <StyledMain>
+      <StyledMain isLoggedIn={userEmail.length > 0}>
         <Routing />
       </StyledMain>
     </ThemeProvider>
