@@ -1,9 +1,9 @@
 import React from "react";
 
-export default function ErrorModal({ errorsArray, clearErrors }) {
+export default function ErrorModal({ errorsArray, closeHandler }) {
   return (
     <div>
-      <button data-testid="closeErrorBtn" onClick={() => clearErrors([])}>
+      <button data-testid="closeErrorBtn" onClick={closeHandler}>
         &#10006;
       </button>
       <ul>

@@ -14,3 +14,11 @@ export const StyledButton = styled.button`
       lighten(0.1, leadingColor)};
   }
 `;
+
+export const StyledDeleteButton = styled(StyledButton)`
+  background-color: #ff1205;
+  color: white;
+  &:hover {
+    background-color: ${lighten(0.1, "#ff1205")};
+  }
+`;

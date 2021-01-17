@@ -70,7 +70,10 @@ export default function Login() {
   return (
     <>
       {errorsList.length > 0 && (
-        <ErrorModal errorsArray={errorsList} clearErrors={setErrorsList} />
+        <ErrorModal
+          errorsArray={errorsList}
+          closeHandler={() => setErrorsList([])}
+        />
       )}
       {isLoading ? (
         <Loader />

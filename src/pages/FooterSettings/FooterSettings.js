@@ -132,7 +132,10 @@ export default function FooterSettings() {
   return (
     <>
       {errorsList.length > 0 && (
-        <ErrorModal errorsArray={errorsList} clearErrors={setErrorsList} />
+        <ErrorModal
+          errorsArray={errorsList}
+          closeHandler={() => setErrorsList([])}
+        />
       )}
       <Formik
         validationSchema={validationSchema}

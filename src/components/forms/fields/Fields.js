@@ -1,14 +1,23 @@
 import { useField } from "formik";
+import { StyledErrorMessage } from "../../Errors/ErrorStyles";
+import { StyledInput } from "../../StyledComponents/Input";
+import {
+  StyledStandardFieldContainer,
+  StyledFileUploadBtn,
+  StyledTextAreaContainer,
+} from "./FieldsStyles";
 
 export const StandardField = ({ label, ...props }) => {
   const [field, meta] = useField(props.name);
   const id = props.id ? props.id : props.name;
   return (
-    <>
+    <StyledStandardFieldContainer isCheckbox={props.type === "checkbox"}>
       <label htmlFor={id}>{label}</label>
-      <input id={id} {...field} {...props} />
-      {meta.touched && meta.error ? <div>{meta.error}</div> : null}
-    </>
+      <StyledInput id={id} {...field} {...props} />
+      {meta.touched && meta.error && (
+        <StyledErrorMessage>{meta.error}</StyledErrorMessage>
+      )}
+    </StyledStandardFieldContainer>
   );
 };
 
@@ -16,11 +25,13 @@ export const TextArea = ({ label, ...props }) => {
   const [field, meta] = useField(props.name);
   const id = props.id ? props.id : props.name;
   return (
-    <>
+    <StyledTextAreaContainer>
       <label htmlFor={id}>{label}</label>
       <textarea id={id} {...field} {...props}></textarea>
-      {meta.touched && meta.error ? <div>{meta.error}</div> : null}
-    </>
+      {meta.touched && meta.error && (
+        <StyledErrorMessage>{meta.error}</StyledErrorMessage>
+      )}
+    </StyledTextAreaContainer>
   );
 };
 
@@ -34,12 +45,22 @@ export function FileUploadField({ label, ...props }) {
   };
 
   return (
-    <div>
+    <>
       <label htmlFor={id}>{label}</label>
-      <input {...props} id={id} type="file" onChange={handleInputChange} />
-      <label htmlFor={id}>{computedLabel}</label>
-      {meta.touched && meta.error ? <div>{meta.error}</div> : null}
-    </div>
+      <input
+        {...props}
+        id={id}
+        type="file"
+        onChange={handleInputChange}
+        style={{ display: "none" }}
+      />
+      <StyledFileUploadBtn as="label" htmlFor={id}>
+        {computedLabel}
+      </StyledFileUploadBtn>
+      {meta.touched && meta.error && (
+        <StyledErrorMessage>{meta.error}</StyledErrorMessage>
+      )}
+    </>
   );
 }
 
@@ -52,7 +73,9 @@ export const SelectField = ({ label, children, ...props }) => {
       <select id={id} {...field} {...props}>
         {children}
       </select>
-      {meta.touched && meta.error ? <div>{meta.error}</div> : null}
+      {meta.touched && meta.error && (
+        <StyledErrorMessage>{meta.error}</StyledErrorMessage>
+      )}
     </>
   );
 };

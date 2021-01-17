@@ -243,7 +243,10 @@ export default function SaveCategory({
   return (
     <>
       {errorsList.length > 0 && (
-        <ErrorModal errorsArray={errorsList} clearErrors={setErrorsList} />
+        <ErrorModal
+          errorsArray={errorsList}
+          closeHandler={() => setErrorsList([])}
+        />
       )}
       <label htmlFor="categoryName">Category name</label>
       <input
