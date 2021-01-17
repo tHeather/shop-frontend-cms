@@ -17,6 +17,7 @@ export const StyledFileUploadBtn = styled(StyledButton)`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: center;
 `;
 
 export const StyledTextAreaContainer = styled.div`

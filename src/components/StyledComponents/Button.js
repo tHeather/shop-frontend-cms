@@ -22,3 +22,28 @@ export const StyledDeleteButton = styled(StyledButton)`
     background-color: ${lighten(0.1, "#ff1205")};
   }
 `;
+
+export const StyledBackToListButton = styled.button`
+  font-weight: bold;
+  margin: 0 30px;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  &::before {
+    content: "<";
+    font-size: 30px;
+    position: absolute;
+    transition: transform 0.3s;
+    transform: translateX(-20px);
+    color: ${({ theme: { leadingColor } }) => leadingColor};
+  }
+  &:hover {
+    color: #585958;
+    &::before {
+      transform: translateX(-30px);
+    }
+  }
+`;

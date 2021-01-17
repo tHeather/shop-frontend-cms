@@ -11,6 +11,10 @@ import { Pagination } from "../../../components/Utils/ListUtils/ListUtils";
 import { MakeQueryString } from "../../../components/Utils/QueryStringUtils/QueryStringUtils";
 import { settings } from "../../../settings";
 import EditProduct from "../EditProduct/EditProduct";
+import {
+  StyledProductListEditProductContainer,
+  StyledProductListBackToListButton,
+} from "./ProductListStyles";
 
 const getProducts = async (
   searchParams,
@@ -213,13 +217,17 @@ export default function ProductList() {
 
   if (selectedProductId)
     return (
-      <>
-        <button onClick={() => setSelectedProductId(null)}>Back to list</button>
+      <StyledProductListEditProductContainer>
+        <StyledProductListBackToListButton
+          onClick={() => setSelectedProductId(null)}
+        >
+          Back to list
+        </StyledProductListBackToListButton>
         <EditProduct
           productId={selectedProductId}
           setSelectedProductId={setSelectedProductId}
         />
-      </>
+      </StyledProductListEditProductContainer>
     );
 
   return (

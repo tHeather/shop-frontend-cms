@@ -1,5 +1,6 @@
 import { Form } from "formik";
 import styled from "styled-components";
+import { background } from "../../../components/StyledComponents/Background";
 import { StyledButton } from "../../../components/StyledComponents/Button";
 
 const DESKTOP_THRESHOLD = 1110;
@@ -7,10 +8,8 @@ const MEDIUM_THRESHOLD = 780;
 const MOBILE_THRESHOLD = 450;
 
 export const StyledSaveProductForm = styled(Form)`
+  ${background}
   margin: 30px auto;
-  background-color: ${({ theme: { secondaryColor } }) => secondaryColor};
-  border-radius: 10px;
-  padding: 1.5rem 1.5rem;
   display: grid;
   grid-template-columns: minmax(300px, 500px) 720px;
   grid-template-areas: "fields images" "submitBtn submitBtn";

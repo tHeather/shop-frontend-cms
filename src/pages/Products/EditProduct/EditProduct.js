@@ -6,6 +6,10 @@ import Loader from "../../../components/loader/Loader";
 import { Modal } from "../../../components/Messages/Modal";
 import { settings } from "../../../settings";
 import SaveProduct from "../SaveProduct/SaveProduct";
+import {
+  StyledEditProductDeleteButton,
+  StyledEditProductContainer,
+} from "./EditProductStyles";
 
 const deleteProduct = async (
   productId,
@@ -80,8 +84,12 @@ export default function EditProduct({ productId, setSelectedProductId }) {
   if (isLoading) return <Loader />;
 
   return (
-    <>
-      <button
+    <StyledEditProductContainer>
+      <SaveProduct
+        productId={productId}
+        setSelectedProductId={setSelectedProductId}
+      />
+      <StyledEditProductDeleteButton
         onClick={() => {
           deleteProduct(
             productId,
@@ -93,11 +101,7 @@ export default function EditProduct({ productId, setSelectedProductId }) {
         }}
       >
         Delete product
-      </button>
-      <SaveProduct
-        productId={productId}
-        setSelectedProductId={setSelectedProductId}
-      />
-    </>
+      </StyledEditProductDeleteButton>
+    </StyledEditProductContainer>
   );
 }
