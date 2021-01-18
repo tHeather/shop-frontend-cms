@@ -8,8 +8,12 @@ export const StyledStandardFieldContainer = styled.div`
   label {
     margin-bottom: 10px;
   }
-  input {
-    ${({ isCheckbox }) => isCheckbox && "order:-1;"};
+  input[type="checkbox"] {
+    order: -1;
+  }
+  input[type="color"] {
+    padding: unset;
+    border-radius: unset;
   }
 `;
 

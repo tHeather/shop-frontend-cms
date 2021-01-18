@@ -135,20 +135,18 @@ export default function SaveProduct({ productId, setSelectedProductId }) {
     setSelectedProductId(null);
   }, [isProductNotFound]);
 
-  if (activeModalText)
-    return (
-      <InfoModal
-        closeHandler={() => dispatch(closeModalActionCreator())}
-        btnText="OK"
-      >
-        <p>{activeModalText}</p>
-      </InfoModal>
-    );
-
   if (isLoading) return <Loader />;
 
   return (
     <>
+      {activeModalText && (
+        <InfoModal
+          closeHandler={() => dispatch(closeModalActionCreator())}
+          btnText="OK"
+        >
+          <p>{activeModalText}</p>
+        </InfoModal>
+      )}
       {errorsList && (
         <ErrorModal
           errorsArray={errorsList}

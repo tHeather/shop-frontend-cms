@@ -14,8 +14,7 @@ import {
 const deleteProduct = async (
   productId,
   setIsLoading,
-  setIsDeleted,
-  setisNotFund,
+  setActiveModalText,
   history
 ) => {
   try {
@@ -29,7 +28,7 @@ const deleteProduct = async (
 
     switch (response.status) {
       case 204:
-        setIsDeleted(true);
+        setActiveModalText("Product successfully deleted.");
         setIsLoading(false);
         break;
       case 401:
@@ -37,7 +36,7 @@ const deleteProduct = async (
         HandleUnauthorizedOrForbiddenError(history);
         break;
       case 404:
-        setisNotFund(true);
+        setActiveModalText("Product not found.");
         setIsLoading(false);
         break;
       case 500:
@@ -52,33 +51,17 @@ const deleteProduct = async (
   }
 };
 
-const BacktoListModal = ({ setSelectedProductId, children }) => {
-  return (
-    <Modal>
-      {children}
-      <button onClick={() => setSelectedProductId(null)}>Back to list</button>
-    </Modal>
-  );
-};
-
 export default function EditProduct({ productId, setSelectedProductId }) {
+  const [activeModalText, setActiveModalText] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isNotFund, setisNotFund] = useState(false);
-  const [isDeleted, setIsDeleted] = useState(false);
   const history = useHistory();
 
-  if (isNotFund)
+  if (activeModalText)
     return (
-      <BacktoListModal setSelectedProductId={setSelectedProductId}>
-        <p>Product not found.</p>
-      </BacktoListModal>
-    );
-
-  if (isDeleted)
-    return (
-      <BacktoListModal setSelectedProductId={setSelectedProductId}>
-        <p>Product successfully deleted.</p>
-      </BacktoListModal>
+      <Modal>
+        <p>{activeModalText}</p>
+        <button onClick={() => setSelectedProductId(null)}>Back to list</button>
+      </Modal>
     );
 
   if (isLoading) return <Loader />;
@@ -91,13 +74,7 @@ export default function EditProduct({ productId, setSelectedProductId }) {
       />
       <StyledEditProductDeleteButton
         onClick={() => {
-          deleteProduct(
-            productId,
-            setIsLoading,
-            setIsDeleted,
-            setisNotFund,
-            history
-          );
+          deleteProduct(productId, setIsLoading, setActiveModalText, history);
         }}
       >
         Delete product

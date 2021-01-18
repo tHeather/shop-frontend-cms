@@ -6,6 +6,8 @@ import {
 } from "../../../components/constants/constants";
 import { JsonFetch } from "../../../components/fetches/Fetches";
 import Loader from "../../../components/loader/Loader";
+import { StyledButton } from "../../../components/StyledComponents/Button";
+import { StyledInput } from "../../../components/StyledComponents/Input";
 import { DisplayImage } from "../../../components/Utils/ImageUtils/ImageUtils";
 import { Pagination } from "../../../components/Utils/ListUtils/ListUtils";
 import { MakeQueryString } from "../../../components/Utils/QueryStringUtils/QueryStringUtils";
@@ -14,6 +16,12 @@ import EditProduct from "../EditProduct/EditProduct";
 import {
   StyledProductListEditProductContainer,
   StyledProductListBackToListButton,
+  StyledProductListFiltersContainer,
+  StyledProductListProductContainer,
+  StyledProductListListContainer,
+  StyledProductListPaginationContainer,
+  StyledProductListContainer,
+  StyledProductListFiltersInner,
 } from "./ProductListStyles";
 
 const getProducts = async (
@@ -55,7 +63,8 @@ export const ProductSortSelect = ({ handleChange, defaultValue }) => {
   return (
     <>
       <label htmlFor="sortType">Sort by:</label>
-      <select
+      <StyledInput
+        as="select"
         id="sortType"
         name="sortType"
         onChange={handleChange}
@@ -67,7 +76,7 @@ export const ProductSortSelect = ({ handleChange, defaultValue }) => {
         <option value={SORT_TYPES.quantityDescending}>
           Quantity descending
         </option>
-      </select>
+      </StyledInput>
     </>
   );
 };
@@ -81,7 +90,7 @@ export const ProductTypeFilters = ({ handleChange, defaultValue }) => {
       }}
     >
       <label htmlFor={FILTER_TYPE.type}>Type of product</label>
-      <input
+      <StyledInput
         id={FILTER_TYPE.type}
         name={FILTER_TYPE.type}
         type="text"
@@ -95,16 +104,16 @@ export const ProductTypeFilters = ({ handleChange, defaultValue }) => {
 
 export const ProductIsOnDiscountFilter = ({ handleChange, defaultValue }) => {
   return (
-    <>
-      <label htmlFor={FILTER_TYPE.isOnDiscount}>Is on discount</label>
-      <input
+    <div>
+      <StyledInput
         id={FILTER_TYPE.isOnDiscount}
         name={FILTER_TYPE.isOnDiscount}
         type="checkbox"
         onChange={handleChange}
         defaultChecked={defaultValue}
       />
-    </>
+      <label htmlFor={FILTER_TYPE.isOnDiscount}>Is on discount</label>
+    </div>
   );
 };
 
@@ -116,7 +125,7 @@ export const ProductSearch = ({ defaultValue, handleChange }) => {
         e.target[0].blur();
       }}
     >
-      <input
+      <StyledInput
         name="search"
         type="text"
         maxLength="150"
@@ -124,7 +133,7 @@ export const ProductSearch = ({ defaultValue, handleChange }) => {
         onBlur={handleChange}
         defaultValue={defaultValue}
       />
-      <button>Submit</button>
+      <StyledButton>Submit</StyledButton>
     </form>
   );
 };
@@ -146,14 +155,38 @@ const DisplayProductList = ({ products, handleOnClick }) => {
       isOnDiscount,
       discountPrice,
     }) => (
-      <article key={id} onClick={() => handleOnClick(id)}>
+      <StyledProductListProductContainer
+        key={id}
+        onClick={() => handleOnClick(id)}
+      >
         <DisplayImage src={firstImage} alt={name} />
-        <p>{name}</p>
-        <p>{manufacturer}</p>
-        <p>{quantity}</p>
-        <p>{price}</p>
-        {isOnDiscount && <p>{discountPrice}</p>}
-      </article>
+        <table>
+          <tbody>
+            <tr>
+              <th>Name</th>
+              <td>{name}</td>
+            </tr>
+            <tr>
+              <th>Manufacturer</th>
+              <td>{manufacturer}</td>
+            </tr>
+            <tr>
+              <th>Quantity</th>
+              <td>{quantity}</td>
+            </tr>
+            <tr>
+              <th>Price</th>
+              <td>{price}</td>
+            </tr>
+            {isOnDiscount && (
+              <tr>
+                <th>Discount price</th>
+                <td>{discountPrice}</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </StyledProductListProductContainer>
     )
   );
 };
@@ -231,38 +264,46 @@ export default function ProductList() {
     );
 
   return (
-    <>
-      <ProductSortSelect
-        handleChange={({ target: { value } }) => setSortTypeFilter(value)}
-        defaultValue={sortTypeFilter}
-      />
-      <ProductTypeFilters
-        handleChange={({ target: { value } }) => setTypeFilter(value)}
-        defaultValue={typeFilter}
-      />
-      <ProductIsOnDiscountFilter
-        handleChange={({ target: { checked } }) =>
-          setIsOnDiscountFilter(checked)
-        }
-        defaultValue={isOnDiscountFilter}
-      />
-      <ProductSearch
-        handleChange={({ target: { value } }) => setSearch(value)}
-        defaultValue={search}
-      />
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <DisplayProductList
-          products={products}
-          handleOnClick={setSelectedProductId}
+    <StyledProductListContainer>
+      <StyledProductListFiltersContainer>
+        <StyledProductListFiltersInner>
+          <ProductSortSelect
+            handleChange={({ target: { value } }) => setSortTypeFilter(value)}
+            defaultValue={sortTypeFilter}
+          />
+          <ProductTypeFilters
+            handleChange={({ target: { value } }) => setTypeFilter(value)}
+            defaultValue={typeFilter}
+          />
+          <ProductIsOnDiscountFilter
+            handleChange={({ target: { checked } }) =>
+              setIsOnDiscountFilter(checked)
+            }
+            defaultValue={isOnDiscountFilter}
+          />
+          <ProductSearch
+            handleChange={({ target: { value } }) => setSearch(value)}
+            defaultValue={search}
+          />
+        </StyledProductListFiltersInner>
+      </StyledProductListFiltersContainer>
+      <StyledProductListListContainer>
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <DisplayProductList
+            products={products}
+            handleOnClick={setSelectedProductId}
+          />
+        )}
+      </StyledProductListListContainer>
+      <StyledProductListPaginationContainer>
+        <Pagination
+          pageNumber={pageNumber}
+          setPageNumber={setPageNumber}
+          totalPages={totalPages}
         />
-      )}
-      <Pagination
-        pageNumber={pageNumber}
-        setPageNumber={setPageNumber}
-        totalPages={totalPages}
-      />
-    </>
+      </StyledProductListPaginationContainer>
+    </StyledProductListContainer>
   );
 }
