@@ -38,6 +38,11 @@ export const productPriceConstraints = number()
   .max(1000000, "Maximum price is 1000000.")
   .required("This field is required.");
 
+export const productDescriptionConstraints = string()
+  .trim()
+  .max(2000, "Maximum length of description is 2000 characters.")
+  .required("This field is required.");
+
 export const productDiscountPriceConstraints = number().when("isOnDiscount", {
   is: true,
   then: productPriceConstraints,

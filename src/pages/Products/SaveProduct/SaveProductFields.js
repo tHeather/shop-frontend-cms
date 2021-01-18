@@ -6,6 +6,7 @@ import {
   productPriceConstraints,
   productDiscountPriceConstraints,
   fileValidation,
+  productDescriptionConstraints,
 } from "../../../components/forms/fieldsConstraints/FieldsConstraints";
 import { boolean } from "yup";
 import { object } from "yup";
@@ -21,6 +22,7 @@ export const validationSchema = object().shape({
   firstImage: fileValidation,
   secondImage: fileValidation,
   thirdImage: fileValidation,
+  description: productDescriptionConstraints,
 });
 
 export const initialFormValues = {
