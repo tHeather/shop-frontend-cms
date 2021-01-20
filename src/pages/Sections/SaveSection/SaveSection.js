@@ -5,7 +5,7 @@ import { JsonFetch } from "../../../components/fetches/Fetches";
 import Loader from "../../../components/loader/Loader";
 import { InfoModal } from "../../../components/Messages/Modal";
 import { DisplayImage } from "../../../components/Utils/ImageUtils/ImageUtils";
-import { Pagination } from "../../../components/Utils/ListUtils/ListUtils";
+import { Pagination } from "../../../components/Utils/ListUtils/Pagination/Pagination";
 import { settings } from "../../../settings";
 
 const getProducts = async (
@@ -280,8 +280,7 @@ export default function SaveSection({ sectionId, setSelectedSectionId }) {
         setSectionProducts={setSectionProducts}
       />
       <Pagination
-        pageNumber={pageNumber}
-        setPageNumber={setPageNumber}
+        handlePageNumberChange={(pageNum) => setPageNumber(pageNumber)}
         totalPages={totalPages}
       />
 

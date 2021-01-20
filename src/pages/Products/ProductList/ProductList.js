@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { useHistory } from "react-router";
-import {
-  FILTER_TYPE,
-  SORT_TYPES,
-} from "../../../components/constants/constants";
 import { JsonFetch } from "../../../components/fetches/Fetches";
 import Loader from "../../../components/loader/Loader";
-import { StyledButton } from "../../../components/StyledComponents/Button";
-import { StyledInput } from "../../../components/StyledComponents/Input";
+import {
+  loaderActionCreator,
+  serverErrorActionCreator,
+} from "../../../components/Utils/GlobalActions/GlobalActions";
 import { DisplayImage } from "../../../components/Utils/ImageUtils/ImageUtils";
-import { Pagination } from "../../../components/Utils/ListUtils/ListUtils";
+import { Pagination } from "../../../components/Utils/ListUtils/Pagination/Pagination";
 import { MakeQueryString } from "../../../components/Utils/QueryStringUtils/QueryStringUtils";
 import { settings } from "../../../settings";
 import EditProduct from "../EditProduct/EditProduct";
+import ProductListFilters from "./Filters/ProductListFilters";
+import {
+  changePageNumberActionCreator,
+  saveProductsActionCreator,
+} from "./ProductListReducer";
 import {
   StyledProductListEditProductContainer,
   StyledProductListBackToListButton,
@@ -21,18 +24,13 @@ import {
   StyledProductListListContainer,
   StyledProductListPaginationContainer,
   StyledProductListContainer,
-  StyledProductListFiltersInner,
+  StyledProductListFiltersBtn,
 } from "./ProductListStyles";
+import { productListReducer } from "./ProductListReducer";
 
-const getProducts = async (
-  searchParams,
-  setTotalPages,
-  setIsLoading,
-  setProducts,
-  history
-) => {
+const getProducts = async (searchParams, dispatch) => {
+  dispatch(loaderActionCreator(true));
   try {
-    setIsLoading(true);
     const response = await JsonFetch(
       `${settings.backendApiUrl}/api/Product?${MakeQueryString(searchParams)}`,
       "GET",
@@ -43,12 +41,10 @@ const getProducts = async (
     switch (response.status) {
       case 200:
         const { result, totalPages } = await response.json();
-        setTotalPages(totalPages);
-        setProducts(result);
-        setIsLoading(false);
+        dispatch(saveProductsActionCreator(result, totalPages));
         break;
       case 500:
-        history.push("/500");
+        dispatch(serverErrorActionCreator());
         break;
       default:
         console.log(response);
@@ -57,85 +53,6 @@ const getProducts = async (
   } catch (err) {
     console.error(err);
   }
-};
-
-export const ProductSortSelect = ({ handleChange, defaultValue }) => {
-  return (
-    <>
-      <label htmlFor="sortType">Sort by:</label>
-      <StyledInput
-        as="select"
-        id="sortType"
-        name="sortType"
-        onChange={handleChange}
-        defaultValue={defaultValue}
-      >
-        <option value={SORT_TYPES.nameAscending}>Name ascending</option>
-        <option value={SORT_TYPES.nameDescending}>Name descending</option>
-        <option value={SORT_TYPES.quantityAscending}>Quantity ascending</option>
-        <option value={SORT_TYPES.quantityDescending}>
-          Quantity descending
-        </option>
-      </StyledInput>
-    </>
-  );
-};
-
-export const ProductTypeFilters = ({ handleChange, defaultValue }) => {
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.target[0].blur();
-      }}
-    >
-      <label htmlFor={FILTER_TYPE.type}>Type of product</label>
-      <StyledInput
-        id={FILTER_TYPE.type}
-        name={FILTER_TYPE.type}
-        type="text"
-        maxLength="150"
-        onBlur={handleChange}
-        defaultValue={defaultValue}
-      />
-    </form>
-  );
-};
-
-export const ProductIsOnDiscountFilter = ({ handleChange, defaultValue }) => {
-  return (
-    <div>
-      <StyledInput
-        id={FILTER_TYPE.isOnDiscount}
-        name={FILTER_TYPE.isOnDiscount}
-        type="checkbox"
-        onChange={handleChange}
-        defaultChecked={defaultValue}
-      />
-      <label htmlFor={FILTER_TYPE.isOnDiscount}>Is on discount</label>
-    </div>
-  );
-};
-
-export const ProductSearch = ({ defaultValue, handleChange }) => {
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.target[0].blur();
-      }}
-    >
-      <StyledInput
-        name="search"
-        type="text"
-        maxLength="150"
-        placeholder="Search for a product..."
-        onBlur={handleChange}
-        defaultValue={defaultValue}
-      />
-      <StyledButton>Submit</StyledButton>
-    </form>
-  );
 };
 
 const DisplayProductList = ({ products, handleOnClick }) => {
@@ -191,62 +108,33 @@ const DisplayProductList = ({ products, handleOnClick }) => {
   );
 };
 
-const MakeSearchParamsObject = (
-  pageNumber,
-  type,
-  isOnDiscount,
-  sortType,
-  search
-) => {
-  return {
-    pageNumber,
-    [FILTER_TYPE.type]: type,
-    [FILTER_TYPE.isOnDiscount]: isOnDiscount,
-    sortType,
-    search,
-  };
+const initialState = {
+  filters: null,
+  products: null,
+  totalPages: 0,
+  pageNumber: 1,
+  isLoading: false,
+  isServerError: false,
 };
 
 export default function ProductList() {
-  const [typeFilter, setTypeFilter] = useState("");
-  const [isOnDiscountFilter, setIsOnDiscountFilter] = useState(false);
-  const [sortTypeFilter, setSortTypeFilter] = useState(
-    SORT_TYPES.nameAscending
-  );
-  const [search, setSearch] = useState("");
-  const [pageNumber, setPageNumber] = useState(1);
+  const [
+    { filters, products, totalPages, pageNumber, isLoading, isServerError },
+    dispatch,
+  ] = useReducer(productListReducer, initialState);
 
   const [selectedProductId, setSelectedProductId] = useState(null);
-  const [products, setProducts] = useState(null);
-
-  const [totalPages, setTotalPages] = useState(0);
-
-  const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
 
   useEffect(() => {
     if (selectedProductId) return;
-    getProducts(
-      MakeSearchParamsObject(
-        pageNumber,
-        typeFilter,
-        isOnDiscountFilter,
-        sortTypeFilter,
-        search
-      ),
-      setTotalPages,
-      setIsLoading,
-      setProducts,
-      history
-    );
-  }, [
-    pageNumber,
-    typeFilter,
-    isOnDiscountFilter,
-    sortTypeFilter,
-    search,
-    selectedProductId,
-  ]);
+    getProducts({ pageNumber, ...filters }, dispatch);
+  }, [pageNumber, filters, selectedProductId]);
+
+  useEffect(() => {
+    if (!isServerError) return;
+    history.push("/500");
+  }, [isServerError]);
 
   if (selectedProductId)
     return (
@@ -266,26 +154,8 @@ export default function ProductList() {
   return (
     <StyledProductListContainer>
       <StyledProductListFiltersContainer>
-        <StyledProductListFiltersInner>
-          <ProductSortSelect
-            handleChange={({ target: { value } }) => setSortTypeFilter(value)}
-            defaultValue={sortTypeFilter}
-          />
-          <ProductTypeFilters
-            handleChange={({ target: { value } }) => setTypeFilter(value)}
-            defaultValue={typeFilter}
-          />
-          <ProductIsOnDiscountFilter
-            handleChange={({ target: { checked } }) =>
-              setIsOnDiscountFilter(checked)
-            }
-            defaultValue={isOnDiscountFilter}
-          />
-          <ProductSearch
-            handleChange={({ target: { value } }) => setSearch(value)}
-            defaultValue={search}
-          />
-        </StyledProductListFiltersInner>
+        <StyledProductListFiltersBtn>Filters</StyledProductListFiltersBtn>
+        <ProductListFilters dispatch={dispatch} />
       </StyledProductListFiltersContainer>
       <StyledProductListListContainer>
         {isLoading ? (
@@ -299,8 +169,9 @@ export default function ProductList() {
       </StyledProductListListContainer>
       <StyledProductListPaginationContainer>
         <Pagination
-          pageNumber={pageNumber}
-          setPageNumber={setPageNumber}
+          handlePageNumberChange={(pageNum) =>
+            dispatch(changePageNumberActionCreator(pageNum))
+          }
           totalPages={totalPages}
         />
       </StyledProductListPaginationContainer>

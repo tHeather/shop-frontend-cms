@@ -1,27 +1,47 @@
-import { StyledInput } from "../../StyledComponents/Input";
+import { useEffect, useRef, useState } from "react";
+import { StyledInput } from "../../../StyledComponents/Input";
 import {
   StyledPaginationButton,
   StyledPaginationForm,
-} from "./ListUtilsStyles";
+} from "./PaginationStyles";
 
-export const validatePagintaionInput = (value, pageNumber, totalPages) => {
-  const int = parseInt(value);
+export const validatePagintaionInput = (inputValue, pageNumber, totalPages) => {
+  const int = parseInt(inputValue);
   if (!int) return pageNumber;
   if (int > totalPages) return totalPages;
-  if (int < 1) return pageNumber;
+  if (int < 1) return 1;
   return int;
 };
 
-const handleOnBlurPagination = (e, pageNumber, totalPages, setPageNumber) => {
-  const {
-    target: { value },
-  } = e;
-  const result = validatePagintaionInput(value, pageNumber, totalPages);
-  e.target.value = result;
-  setPageNumber(result);
+const handleBlur = (e, pageNumber, totalPages, setPageNumber) => {
+  const validatedInput = validatePagintaionInput(
+    e.target.value,
+    pageNumber,
+    totalPages
+  );
+  e.target.value = validatedInput;
+  setPageNumber(validatedInput);
 };
 
-export const Pagination = ({ pageNumber, setPageNumber, totalPages }) => {
+const handleSubmit = (e) => {
+  e.preventDefault();
+  e.target[0].blur();
+};
+
+export const Pagination = ({ handlePageNumberChange, totalPages }) => {
+  const [pageNumber, setPageNumber] = useState(1);
+  const isMounted = useRef(false);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return;
+    }
+    inputRef.current.value = pageNumber;
+    handlePageNumberChange(pageNumber);
+  }, [pageNumber]);
+
   return (
     <>
       <StyledPaginationButton
@@ -41,19 +61,13 @@ export const Pagination = ({ pageNumber, setPageNumber, totalPages }) => {
           />
         </svg>
       </StyledPaginationButton>
-      <StyledPaginationForm
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.target[0].blur();
-        }}
-      >
+      <StyledPaginationForm onSubmit={handleSubmit}>
         <StyledInput
           type="text"
           max={totalPages}
+          ref={inputRef}
           defaultValue={pageNumber}
-          onBlur={(e) =>
-            handleOnBlurPagination(e, pageNumber, totalPages, setPageNumber)
-          }
+          onBlur={(e) => handleBlur(e, pageNumber, totalPages, setPageNumber)}
         />
         / <div>{totalPages}</div>
       </StyledPaginationForm>

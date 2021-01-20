@@ -5,6 +5,9 @@ export const StyledStandardFieldContainer = styled.div`
   display: flex;
   flex-direction: ${({ isCheckbox }) => (isCheckbox ? "row" : "column")};
   margin: 10px 0 20px 0;
+  input {
+    border: 1px solid black;
+  }
   label {
     margin-bottom: 10px;
   }
@@ -32,5 +35,18 @@ export const StyledTextAreaContainer = styled.div`
     resize: none;
     border-radius: 10px;
     padding: 0.3rem 0.6rem;
+    border: 1px solid black;
+  }
+`;
+
+export const StyledSelectFieldContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin: 10px 0 20px 0;
+  input {
+    border: 1px solid black;
+  }
+  label {
+    margin-bottom: 10px;
   }
 `;

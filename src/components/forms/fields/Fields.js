@@ -5,6 +5,7 @@ import {
   StyledStandardFieldContainer,
   StyledFileUploadBtn,
   StyledTextAreaContainer,
+  StyledSelectFieldContainer,
 } from "./FieldsStyles";
 
 export const StandardField = ({ label, ...props }) => {
@@ -68,14 +69,14 @@ export const SelectField = ({ label, children, ...props }) => {
   const [field, meta] = useField(props.name);
   const id = props.id ? props.id : props.name;
   return (
-    <>
+    <StyledSelectFieldContainer>
       <label htmlFor={id}>{label}</label>
-      <select id={id} {...field} {...props}>
+      <StyledInput as="select" id={id} {...field} {...props}>
         {children}
-      </select>
+      </StyledInput>
       {meta.touched && meta.error && (
         <StyledErrorMessage>{meta.error}</StyledErrorMessage>
       )}
-    </>
+    </StyledSelectFieldContainer>
   );
 };

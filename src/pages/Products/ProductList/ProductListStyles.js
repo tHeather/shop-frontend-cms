@@ -1,7 +1,9 @@
-import { lighten } from "polished";
 import styled from "styled-components";
 import { background } from "../../../components/StyledComponents/Background";
-import { StyledBackToListButton } from "../../../components/StyledComponents/Button";
+import {
+  StyledBackToListButton,
+  StyledButton,
+} from "../../../components/StyledComponents/Button";
 
 export const StyledProductListEditProductContainer = styled.div`
   width: 100%;
@@ -26,37 +28,46 @@ export const StyledProductListContainer = styled.div`
   display: grid;
   grid-gap: 20px;
   grid-template: "filters list" "filters pagination";
-  grid-template-columns: 200px 800px;
+  grid-template-columns: 220px 800px;
   grid-template-rows: 1fr auto;
   justify-content: center;
   @media (max-width: 1050px) {
     grid-template: "filters" "list" "pagination";
     grid-template-columns: 1fr;
     grid-template-rows: repeat(3, auto);
+    padding-top: 0;
   }
 `;
 
 export const StyledProductListFiltersContainer = styled.aside`
+  ${background}
   grid-area: filters;
-  background-color: ${({ theme: { tertiaryColor } }) => tertiaryColor};
   border-radius: 10px;
   padding: 5px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  @media (max-width: 1050px) {
+    padding: 0;
+    top: 80px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  form {
+    position: fixed;
+    padding: 20px 5px;
+    @media (max-width: 1050px) {
+      position: unset;
+    }
+  }
 `;
 
-export const StyledProductListFiltersInner = styled.div`
-  position: fixed;
-  &,
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  input,
-  select,
-  button {
-    width: 90%;
-  }
+export const StyledProductListFiltersBtn = styled(StyledButton)`
+  /*   border-radius: 0px; */
+  top: 0;
+  height: 30px;
+  width: 100%;
 `;
 
 export const StyledProductListListContainer = styled.div`
