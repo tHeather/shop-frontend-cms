@@ -31,10 +31,12 @@ export const productManufacturerConstraints = string()
   .required("This field is required.");
 
 export const productQuantityConstraints = number()
+  .min(1, "Minimum quantity is 1")
   .max(10000, "Maximum quantity is 10000.")
   .required("This field is required.");
 
 export const productPriceConstraints = number()
+  .min(1, "Minimum price is 1")
   .max(1000000, "Maximum price is 1000000.")
   .required("This field is required.");
 
