@@ -1,96 +1,97 @@
 import { Form, Formik } from "formik";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useReducer } from "react";
 import { useHistory } from "react-router";
 import { object } from "yup";
-import {
-  HandleErrorMessage,
-  HandleUnauthorizedOrForbiddenError,
-} from "../../components/Errors/ErrorHandlers";
 import ErrorModal from "../../components/Errors/ErrorModal";
-import { FormDataFetch } from "../../components/fetches/Fetches";
 import {
   FileUploadField,
   SelectField,
-  StandardField,
 } from "../../components/forms/fields/Fields";
 import {
-  colorConstraints,
   fileValidation,
   textFileValidation,
 } from "../../components/forms/fieldsConstraints/FieldsConstraints";
 import Loader from "../../components/loader/Loader";
 import { InfoModal } from "../../components/Messages/Modal";
 import { ShopSettingsContext } from "../../components/shopSettingsContext/shopSettingsContext";
-import { MakeFormData } from "../../components/Utils/formDataUtils/FormDataUtils";
 import { DisplayImage } from "../../components/Utils/ImageUtils/ImageUtils";
-import { settings } from "../../settings";
 import { CURRENCY } from "../../components/constants/constants";
-
-const updateSettings = async (
-  setShopSettings,
-  settingsValues,
-  setIsSaved,
-  setIsLoading,
-  setErrorsList,
-  history
-) => {
-  try {
-    setIsLoading(true);
-
-    const response = await FormDataFetch(
-      `${settings.backendApiUrl}/api/ShopSettings`,
-      "PUT",
-      MakeFormData(settingsValues)
-    );
-
-    switch (response.status) {
-      case 200:
-        const settingData = await response.json();
-        setShopSettings(settingData);
-        setIsSaved(true);
-        setIsLoading(false);
-        break;
-      case 400:
-        HandleErrorMessage(response, setErrorsList, setIsLoading);
-        break;
-      case 401:
-      case 403:
-        HandleUnauthorizedOrForbiddenError(history);
-        break;
-      case 500:
-        history.push("/500");
-        break;
-      default:
-        console.log(response);
-        break;
-    }
-  } catch (err) {
-    console.error(err);
-  }
-};
+import {
+  getThemes,
+  updateSettings,
+  deleteRegulations,
+  deleteLogo,
+} from "./ShopSettingsFetches";
+import { settings } from "../../settings";
+import { shopSettingsReducer } from "./ShopSettingsReducer";
+import { HandleUnauthorizedOrForbiddenError } from "../../components/Errors/ErrorHandlers";
+import {
+  closeErrorModalActionCreator,
+  closeModalActionCreator,
+} from "../../components/Utils/GlobalActions/GlobalActions";
 
 const validationSchema = object().shape({
-  tertiaryColor: colorConstraints,
-  secondaryColor: colorConstraints,
-  leadingColor: colorConstraints,
   logo: fileValidation,
   regulations: textFileValidation,
 });
 
-export default function ShopSettings() {
-  const { logo, regulations, setShopSettings, ...settings } = useContext(
-    ShopSettingsContext
-  );
+const initialState = {
+  themes: [],
+  activeModalText: null,
+  activeModalCloseHandlerParams: null,
+  isLoading: false,
+  errorsList: null,
+  isUnauthorized: false,
+  isServerError: false,
+};
 
-  const [isSaved, setIsSaved] = useState(false);
-  const [errorsList, setErrorsList] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+export default function ShopSettings() {
+  const {
+    regulations,
+    logo,
+    currency,
+    theme: { id },
+    setShopSettings,
+  } = useContext(ShopSettingsContext);
+  const [
+    {
+      themes,
+      activeModalText,
+      activeModalCloseHandlerParams,
+      isLoading,
+      errorsList,
+      isUnauthorized,
+      isServerError,
+    },
+    dispatch,
+  ] = useReducer(shopSettingsReducer, initialState);
   const history = useHistory();
 
-  if (isSaved)
+  useEffect(() => {
+    if (themes.length) return;
+    getThemes(dispatch);
+  }, [themes]);
+
+  useEffect(() => {
+    if (!isUnauthorized) return;
+    HandleUnauthorizedOrForbiddenError(history);
+  }, [isUnauthorized]);
+
+  useEffect(() => {
+    if (!isServerError) return;
+    history.push("/500");
+  }, [isServerError]);
+
+  if (activeModalText)
     return (
-      <InfoModal closeHandler={() => setIsSaved(false)} btnText="OK">
-        <p>Settings successfully saved.</p>
+      <InfoModal
+        closeHandler={() => {
+          setShopSettings(activeModalCloseHandlerParams);
+          dispatch(closeModalActionCreator());
+        }}
+        btnText="OK"
+      >
+        <p>{activeModalText}</p>
       </InfoModal>
     );
 
@@ -98,45 +99,28 @@ export default function ShopSettings() {
 
   return (
     <>
-      {errorsList.length > 0 && (
+      {errorsList && (
         <ErrorModal
           errorsArray={errorsList}
-          closeHandler={() => setErrorsList([])}
+          closeHandler={() => dispatch(closeErrorModalActionCreator())}
         />
       )}
       <Formik
         validationSchema={validationSchema}
-        initialValues={{ ...settings, logo: "", regulations: "" }}
-        onSubmit={(settingsValues) =>
-          updateSettings(
-            setShopSettings,
-            settingsValues,
-            setIsSaved,
-            setIsLoading,
-            setErrorsList,
-            history
-          )
-        }
+        initialValues={{ themeId: id, currency, logo: "", regulations: "" }}
+        onSubmit={(settingsValues) => updateSettings(settingsValues, dispatch)}
       >
-        {({ isValid }) => (
+        {({ isValid, values }) => (
           <Form data-testid="shopSettingsForm">
-            <StandardField
-              name="leadingColor"
-              label="Leading color"
-              type="color"
-            />
-            <StandardField
-              name="secondaryColor"
-              label="Secondary color"
-              type="color"
-            />
-            <StandardField
-              name="tertiaryColor"
-              label="Tertiary color"
-              type="color"
-            />
+            <SelectField name="themeId" label="Theme">
+              {themes.map(({ id, name }) => (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              ))}
+            </SelectField>
 
-            <SelectField id="currency" name="currency" label="Currency">
+            <SelectField name="currency" label="Currency">
               {CURRENCY.map((currency, index) => (
                 <option key={currency} value={index}>
                   {currency}
@@ -144,19 +128,36 @@ export default function ShopSettings() {
               ))}
             </SelectField>
 
-            <DisplayImage src={logo} />
-
+            <DisplayImage src={values.logo || logo} alt="logo" />
             <FileUploadField
               name="logo"
               accept=".jpg, .jpeg, .png, .pdf"
               label="Logo"
             />
+            {logo && (
+              <button onClick={() => deleteLogo(dispatch)}>Delete logo</button>
+            )}
 
             <FileUploadField
               name="regulations"
-              accept=".doc .docx .pdf"
+              accept=".doc, .docx, .pdf"
               label="Regulations"
             />
+            <div>
+              Current regulation:
+              {regulations ? (
+                <>
+                  <a href={`${settings.backendApiUrl}/${regulations}`} download>
+                    Download regulation
+                  </a>
+                  <button onClick={() => deleteRegulations(dispatch)}>
+                    Delete regulations
+                  </button>
+                </>
+              ) : (
+                "no regulations yet"
+              )}
+            </div>
 
             <button type="submit" disabled={!isValid}>
               Save

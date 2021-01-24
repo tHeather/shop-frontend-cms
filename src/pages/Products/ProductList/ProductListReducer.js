@@ -1,32 +1,32 @@
 import { GLOBAL_ACTIONS } from "../../../components/Utils/GlobalActions/GlobalActions";
 
-export const PRODUCT_LIST_ACTIONS = {
+const PRODUCT_LIST_ACTIONS = {
   changePageNumber: "changePageNumber",
   submitFilters: "submitFilters",
   saveProducts: "saveProducts",
 };
 
-export function productListReducer(state, action) {
-  switch (action.type) {
+export function productListReducer(state, { type, payload }) {
+  switch (type) {
     case PRODUCT_LIST_ACTIONS.saveProducts:
       return {
         ...state,
-        totalPages: action.totalPages,
-        products: action.products,
+        totalPages: payload.totalPages,
+        products: payload.products,
         isLoading: false,
       };
     case PRODUCT_LIST_ACTIONS.submitFilters:
       return {
         ...state,
-        filters: action.filters,
+        filters: payload.filters,
       };
     case PRODUCT_LIST_ACTIONS.changePageNumber:
       return {
         ...state,
-        pageNumber: action.pageNumber,
+        pageNumber: payload.pageNumber,
       };
     case GLOBAL_ACTIONS.loader:
-      return { ...state, isLoading: action.isLoading };
+      return { ...state, isLoading: payload.isLoading };
     case GLOBAL_ACTIONS.serverError:
       return { ...state, isServerError: true };
     default:
@@ -37,21 +37,20 @@ export function productListReducer(state, action) {
 export const saveProductsActionCreator = (products, totalPages) => {
   return {
     type: PRODUCT_LIST_ACTIONS.saveProducts,
-    totalPages,
-    products,
+    payload: { totalPages, products },
   };
 };
 
 export const submitFiltersActionCreator = (filters) => {
   return {
     type: PRODUCT_LIST_ACTIONS.submitFilters,
-    filters,
+    payload: { filters },
   };
 };
 
 export const changePageNumberActionCreator = (pageNumber) => {
   return {
     type: PRODUCT_LIST_ACTIONS.changePageNumber,
-    pageNumber,
+    payload: { pageNumber },
   };
 };

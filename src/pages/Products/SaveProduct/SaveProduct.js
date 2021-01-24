@@ -25,7 +25,7 @@ import { saveProductReducer } from "./SaveProductReducer";
 import { initialFormValues, validationSchema } from "./SaveProductFields";
 import {
   StyledSaveProductForm,
-  StyledSaveProductFieldsSection,
+  StyledSaveProductFeaturesSection,
   StyledSaveProductImageSection,
   StyledSaveProductImageSectionElement,
   StyledSaveProductSubmitBtn,
@@ -33,6 +33,7 @@ import {
 } from "./SaveProductStyles";
 import { isString } from "../../../components/Utils/StringUtils/StringUtils";
 import { StyledDeleteButton } from "../../../components/StyledComponents/Button";
+import { StyledPageHeadline } from "../../../components/StyledComponents/PageHeadlineStyles";
 
 const makeImageSectionElements = ({ firstImage, secondImage, thirdImage }) => {
   return [
@@ -58,6 +59,7 @@ const makeImageSectionElements = ({ firstImage, secondImage, thirdImage }) => {
 const ImageSection = ({ images, productId, dispatch }) => {
   return (
     <StyledSaveProductImageSection>
+      <h2>Photos</h2>
       {makeImageSectionElements(images).map(({ image, fieldName, label }) => (
         <StyledSaveProductImageSectionElement key={fieldName}>
           <DisplayImage src={image} />
@@ -153,6 +155,9 @@ export default function SaveProduct({ productId, setSelectedProductId }) {
           closeHandler={() => dispatch(closeErrorModalActionCreator())}
         />
       )}
+      <StyledPageHeadline>
+        {productId ? "Edit product" : "Add new product"}
+      </StyledPageHeadline>
       <Formik
         validationSchema={validationSchema}
         initialValues={formValues}
@@ -167,7 +172,8 @@ export default function SaveProduct({ productId, setSelectedProductId }) {
           values: { isOnDiscount, firstImage, secondImage, thirdImage },
         }) => (
           <StyledSaveProductForm data-testid="saveProductForm">
-            <StyledSaveProductFieldsSection>
+            <StyledSaveProductFeaturesSection>
+              <h2>Features</h2>
               <StandardField name="name" label="Product name" type="text" />
               <StandardField name="type" label="Type of product" type="text" />
               <StandardField
@@ -197,7 +203,7 @@ export default function SaveProduct({ productId, setSelectedProductId }) {
                 label="Product description"
                 rows="25"
               />
-            </StyledSaveProductFieldsSection>
+            </StyledSaveProductFeaturesSection>
 
             <ImageSection
               images={{

@@ -70,7 +70,11 @@ export const fileValidation = mixed()
     (value) => (value ? SUPPORTED_FORMATS.includes(value.type) : true)
   );
 
-const TEXT_SUPPORTED_FORMATS = [".pdf", ".doc", ".docx"];
+const TEXT_SUPPORTED_FORMATS = [
+  "application/pdf",
+  "application/doc",
+  "application/docx",
+];
 
 export const textFileValidation = mixed()
   .test("fileSize", "Maximum size of file is 10 mb.", (value) =>
@@ -81,8 +85,6 @@ export const textFileValidation = mixed()
     "The accepted file formats are pdf, doc , docx",
     (value) => (value ? TEXT_SUPPORTED_FORMATS.includes(value.type) : true)
   );
-
-export const colorConstraints = string().required("This field is required.");
 
 export const timeRangeValidation = string()
   .matches(

@@ -1,8 +1,6 @@
-import { readableColor } from "polished";
 import styled, { css } from "styled-components";
 
 const NAVBAR_HEIGHT = 50;
-const NAVBAR_COLOR = "#ffffff";
 const COLLAPSE_BTN_HEIGHT = 30;
 const MOBILE_THRESHOLD = 920;
 
@@ -15,7 +13,8 @@ const hoverAnimation = css`
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: ${({ theme: { leadingColor } }) => leadingColor};
+    background-color: ${({ theme: { leadingBackgroundColor } }) =>
+      leadingBackgroundColor};
     border-radius: 10px;
     z-index: -1;
     transform: scaleX(0);
@@ -23,7 +22,7 @@ const hoverAnimation = css`
     transform-origin: left;
   }
   &:hover {
-    color: ${({ theme: { leadingColor } }) => readableColor(leadingColor)};
+    color: ${({ theme: { leadingTextColor } }) => leadingTextColor};
     &::before {
       transform: scaleX(1);
     }
@@ -40,7 +39,9 @@ export const StyledNavBar = styled.header`
   display: flex;
   justify-content: flex-end;
   box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.25);
-  background: ${NAVBAR_COLOR};
+  background-color: ${({ theme: { navbarBackgroundColor } }) =>
+    navbarBackgroundColor};
+  color: ${({ theme: { navbarTextColor } }) => navbarTextColor};
   border-radius: ${({ isOpen }) => (isOpen ? "0" : "0 0 10px 10px")};
 `;
 
@@ -52,7 +53,9 @@ export const StyledNav = styled.nav`
       isOpen ? "translateX(0)" : "translateX(-100%)"};
     position: absolute;
     top: ${NAVBAR_HEIGHT}px;
-    background: ${NAVBAR_COLOR};
+    background-color: ${({ theme: { navbarBackgroundColor } }) =>
+      navbarBackgroundColor};
+    color: ${({ theme: { navbarTextColor } }) => navbarTextColor};
     flex-direction: column;
     justify-content: flex-start;
     padding: 50px 0;
@@ -64,6 +67,7 @@ export const StyledNav = styled.nav`
 `;
 
 export const StyledNavCloseBtn = styled.button`
+  color: ${({ theme: { navbarTextColor } }) => navbarTextColor};
   display: none;
   @media (max-width: ${MOBILE_THRESHOLD}px) {
     display: block;
@@ -81,6 +85,7 @@ export const StyledCollapseBtn = styled.button`
   padding: 5px 35px;
   background: none;
   border: none;
+  color: ${({ theme: { navbarTextColor } }) => navbarTextColor};
   cursor: pointer;
   @media (min-width: ${MOBILE_THRESHOLD + 1}px) {
     cursor: default;
@@ -101,9 +106,10 @@ export const StyledCollapseContainer = styled.div`
     }
   }
   .activeMobileCollapseBtn {
-    background-color: ${({ theme: { leadingColor } }) => leadingColor};
+    background-color: ${({ theme: { leadingBackgroundColor } }) =>
+      leadingBackgroundColor};
     border-radius: 10px;
-    color: ${({ theme: { leadingColor } }) => readableColor(leadingColor)};
+    color: ${({ theme: { leadingTextColor } }) => leadingTextColor};
   }
 `;
 
@@ -114,11 +120,12 @@ const collapseContent = css`
   box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.25);
   text-align: center;
   margin: ${(NAVBAR_HEIGHT - COLLAPSE_BTN_HEIGHT - 1) / 2}px 0 0 0;
-  background: ${NAVBAR_COLOR};
+  background-color: ${({ theme: { navbarBackgroundColor } }) =>
+    navbarBackgroundColor};
+  color: ${({ theme: { navbarTextColor } }) => navbarTextColor};
 
   a {
     text-decoration: none;
-    color: black;
     display: block;
     width: 100%;
     ${hoverAnimation}
@@ -145,7 +152,9 @@ export const StyledNavAccountLinks = styled.div`
   ${collapseContent}
   padding: 20px 0;
   div:first-child {
-    background-color: ${({ theme: { secondaryColor } }) => secondaryColor};
+    background-color: ${({ theme: { secondaryBackgroundColor } }) =>
+      secondaryBackgroundColor};
+    color: ${({ theme: { secondaryTextColor } }) => secondaryTextColor};
     border-radius: 10px;
     padding: 10px 0;
     overflow: hidden;

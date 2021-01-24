@@ -1,53 +1,93 @@
-import { act, render, waitFor, screen } from "@testing-library/react";
+import { act, render, waitFor, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { settings } from "../../settings";
 import userEvent from "@testing-library/user-event";
 import { ShopSettingsContext } from "../../components/shopSettingsContext/shopSettingsContext";
 import ShopSettings from "./ShopSettings";
-import { FormDataFetch } from "../../components/fetches/Fetches";
+import { FormDataFetch, JsonFetch } from "../../components/fetches/Fetches";
 import { MemoryRouter, Route } from "react-router";
+import { ThemeProvider } from "styled-components";
 
 jest.mock("../../components/fetches/Fetches");
+const regulations = new File(["regulations"], "regulations.pdf", {
+  type: "application/pdf",
+});
+const logo = new File(["logo"], "logo.png", { type: "image/png" });
+const themes = [
+  { id: 1, name: "Green, grey and white" },
+  { id: 2, name: "Balck, red and white" },
+];
+
+const DEFAULT_THEME = {
+  id: 1,
+  name: "Green, grey and white",
+  secondaryBackgroundColor: "#f1f1f1",
+  secondaryTextColor: "#000000",
+  leadingBackgroundColor: "#02d463",
+  leadingTextColor: "#000000",
+  navbarBackgroundColor: "#ffffff",
+  navbarTextColor: "#000000",
+  mainBackgroundColor: "#ffffff",
+  mainTextColor: "#000000",
+  footerBackgroundColor: "#ffffff",
+  footerTextColor: "#000000",
+};
 
 describe("shopSettings", () => {
   const mockedSetShopSettings = jest.fn();
   beforeEach(async () => {
+    JsonFetch.mockReturnValueOnce({
+      status: 200,
+      json: () => Promise.resolve(themes),
+    });
     act(() => {
       render(
         <MemoryRouter initialEntries={["/settings"]}>
           <ShopSettingsContext.Provider
             value={{
-              tertiaryColor: "#112233",
-              secondaryColor: "#223344",
-              leadingColor: "#334455",
-              logo: "logo.png",
-              currency: "PLN",
+              theme: DEFAULT_THEME,
+              logo: "",
+              currency: "1",
+              regulations: "",
               setShopSettings: mockedSetShopSettings,
             }}
           >
-            <Route path="/settings">
-              <ShopSettings />
-            </Route>
-            <Route exact path="/500">
-              <div>Server error</div>
-            </Route>
-            <Route exact path="/">
-              <div>Login page</div>
-            </Route>
+            <ThemeProvider theme={DEFAULT_THEME}>
+              <Route path="/settings">
+                <ShopSettings />
+              </Route>
+              <Route exact path="/500">
+                <div>Server error</div>
+              </Route>
+              <Route exact path="/">
+                <div>Login page</div>
+              </Route>
+            </ThemeProvider>
           </ShopSettingsContext.Provider>
         </MemoryRouter>
       );
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId("shopSettingsForm")).toBeInTheDocument()
+    );
+  });
+
+  test("fetch themes and set them into select", () => {
+    const themeSelect = document.getElementById("themeId");
+    const options = within(themeSelect).getAllByRole("option");
+    themes.forEach((theme, index) => {
+      expect(options[index]).toHaveValue(theme.id.toString());
+      expect(options[index]).toHaveTextContent(theme.name.toString());
     });
   });
 
   test("fill form with initial data from context", () => {
     expect(screen.getByTestId("shopSettingsForm")).toHaveFormValues({
-      tertiaryColor: "#112233",
-      secondaryColor: "#223344",
-      leadingColor: "#334455",
+      themeId: "1",
       logo: "",
       regulations: "",
-      currency: "0",
+      currency: "1",
     });
   });
 
@@ -56,21 +96,33 @@ describe("shopSettings", () => {
       status: 200,
       json: () =>
         Promise.resolve({
-          tertiaryColor: "#112233",
-          secondaryColor: "#223344",
-          leadingColor: "#334455",
-          logo: "",
-          regulations: "",
+          themeId: "2",
+          logo: "logo.png",
+          regulations: "regulations.pdf",
           currency: "5",
         }),
     });
 
-    const selectTag = document.getElementById("currency");
-    userEvent.selectOptions(selectTag, "5");
+    const themeSelect = document.getElementById("themeId");
+    const currencySelect = document.getElementById("currency");
+    const logoInput = document.getElementById("logo");
+    const regulationsInput = document.getElementById("regulations");
+
+    userEvent.selectOptions(themeSelect, "2");
+    userEvent.selectOptions(currencySelect, "5");
+    userEvent.upload(logoInput, logo);
+
+    await waitFor(() =>
+      expect(screen.getByAltText("logo")).toBeInTheDocument()
+    );
+
+    userEvent.upload(regulationsInput, regulations);
     userEvent.click(screen.getByText("Save"));
 
     await waitFor(() =>
-      expect(screen.getByTestId("loader")).toBeInTheDocument()
+      expect(
+        screen.getByText("Settings saved successfully.")
+      ).toBeInTheDocument()
     );
 
     expect(FormDataFetch.mock.calls).toHaveLength(1);
@@ -78,12 +130,10 @@ describe("shopSettings", () => {
       `${settings.backendApiUrl}/api/ShopSettings`
     );
     expect(FormDataFetch.mock.calls[0][1]).toBe("PUT");
-    expect(Object.fromEntries(FormDataFetch.mock.calls[0][2])).toEqual({
-      tertiaryColor: "#112233",
-      secondaryColor: "#223344",
-      leadingColor: "#334455",
-      logo: "",
-      regulations: "",
+    expect(Object.fromEntries(FormDataFetch.mock.calls[0][2])).toStrictEqual({
+      themeId: "2",
+      logo,
+      regulations,
       currency: "5",
     });
   });
@@ -93,22 +143,18 @@ describe("shopSettings", () => {
       status: 200,
       json: () =>
         Promise.resolve({
-          tertiaryColor: "#112233",
-          secondaryColor: "#223344",
-          leadingColor: "#334455",
-          regulations: "",
-          logo: "",
+          themeId: "1",
+          logo: "logo.png",
+          regulations: "regulations.pdf",
           currency: "5",
         }),
     });
 
     expect(screen.getByTestId("shopSettingsForm")).toHaveFormValues({
-      tertiaryColor: "#112233",
-      secondaryColor: "#223344",
-      leadingColor: "#334455",
-      regulations: "",
+      themeId: "1",
       logo: "",
-      currency: "0",
+      regulations: "",
+      currency: "1",
     });
 
     const selectTag = document.getElementById("currency");
@@ -120,17 +166,15 @@ describe("shopSettings", () => {
     );
 
     expect(
-      screen.getByText("Settings successfully saved.")
+      screen.getByText("Settings saved successfully.")
     ).toBeInTheDocument();
     userEvent.click(screen.getByText("OK"));
 
     expect(mockedSetShopSettings.mock.calls).toHaveLength(1);
     expect(mockedSetShopSettings.mock.calls[0][0]).toEqual({
-      tertiaryColor: "#112233",
-      secondaryColor: "#223344",
-      leadingColor: "#334455",
-      regulations: "",
-      logo: "",
+      themeId: "1",
+      logo: "logo.png",
+      regulations: "regulations.pdf",
       currency: "5",
     });
   });
@@ -153,12 +197,10 @@ describe("shopSettings", () => {
     userEvent.click(screen.getByTestId("closeErrorBtn"));
 
     expect(screen.getByTestId("shopSettingsForm")).toHaveFormValues({
-      tertiaryColor: "#112233",
-      secondaryColor: "#223344",
-      leadingColor: "#334455",
+      themeId: "1",
       regulations: "",
       logo: "",
-      currency: "0",
+      currency: "1",
     });
   });
 

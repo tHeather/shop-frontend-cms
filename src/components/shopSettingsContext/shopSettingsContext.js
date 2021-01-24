@@ -37,9 +37,20 @@ export const ShopSettingsContext = createContext();
 export default function ShopSettingsProvider({ children }) {
   const history = useHistory();
   const [shopSettings, setShopSettings] = useState({
-    tertiaryColor: "#e4f5ec",
-    secondaryColor: "#f1f1f1",
-    leadingColor: "#02d463",
+    theme: {
+      id: 1,
+      name: "Green, grey and white",
+      secondaryBackgroundColor: "#f1f1f1",
+      secondaryTextColor: "#000000",
+      leadingBackgroundColor: "#02d463",
+      leadingTextColor: "#000000",
+      navbarBackgroundColor: "#ffffff",
+      navbarTextColor: "#000000",
+      mainBackgroundColor: "#ffffff",
+      mainTextColor: "#000000",
+      footerBackgroundColor: "#ffffff",
+      footerTextColor: "#000000",
+    },
     logo: "",
     currency: "",
     regulations: "",

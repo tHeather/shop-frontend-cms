@@ -6,6 +6,22 @@ import Routing from "../routes/Routing";
 import { ShopSettingsContext } from "../shopSettingsContext/shopSettingsContext";
 
 const GlobalStyles = createGlobalStyle`
+html{
+  font-size: 16px;
+  @media (max-width: 500px) {
+    font-size: 14px;
+  }
+  h1{
+    font-size:1.6rem
+  }
+  h2{
+    font-size:1.4rem
+  }
+  label{
+    font-size:1.05rem
+  }
+}
+
 body{
   margin:0;
 }
@@ -18,55 +34,18 @@ body{
 
 const StyledMain = styled.main`
   margin-top: ${({ isLoggedIn }) => (isLoggedIn ? "50px" : 0)};
-  display: flex;
   min-height: 100vh;
-  background-image: linear-gradient(
-      339deg,
-      rgba(47, 47, 47, 0.02) 0%,
-      rgba(47, 47, 47, 0.02) 42%,
-      transparent 42%,
-      transparent 99%,
-      rgba(17, 17, 17, 0.02) 99%,
-      rgba(17, 17, 17, 0.02) 100%
-    ),
-    linear-gradient(
-      257deg,
-      rgba(65, 65, 65, 0.02) 0%,
-      rgba(65, 65, 65, 0.02) 11%,
-      transparent 11%,
-      transparent 92%,
-      rgba(53, 53, 53, 0.02) 92%,
-      rgba(53, 53, 53, 0.02) 100%
-    ),
-    linear-gradient(
-      191deg,
-      rgba(5, 5, 5, 0.02) 0%,
-      rgba(5, 5, 5, 0.02) 1%,
-      transparent 1%,
-      transparent 45%,
-      rgba(19, 19, 19, 0.02) 45%,
-      rgba(19, 19, 19, 0.02) 100%
-    ),
-    linear-gradient(
-      29deg,
-      rgba(28, 28, 28, 0.02) 0%,
-      rgba(28, 28, 28, 0.02) 33%,
-      transparent 33%,
-      transparent 40%,
-      rgba(220, 220, 220, 0.02) 40%,
-      rgba(220, 220, 220, 0.02) 100%
-    ),
-    linear-gradient(90deg, rgb(255, 255, 255), rgb(255, 255, 255));
+  background-color: ${({ theme: { mainBackgroundColor } }) =>
+    mainBackgroundColor};
+  color: ${({ theme: { mainTextColor } }) => mainTextColor};
 `;
 
 export default function Layout() {
   const { userEmail } = useContext(AuthContext);
-  const { logo, currency, regulations, ...colors } = useContext(
-    ShopSettingsContext
-  );
+  const { theme } = useContext(ShopSettingsContext);
 
   return (
-    <ThemeProvider theme={colors}>
+    <ThemeProvider theme={theme}>
       <GlobalStyles />
       <Navigation />
       <StyledMain isLoggedIn={userEmail.length > 0}>

@@ -1,6 +1,6 @@
 import { GLOBAL_ACTIONS } from "../../../components/Utils/GlobalActions/GlobalActions";
 
-export const SAVE_PRODUCT_ACTIONS = {
+const SAVE_PRODUCT_ACTIONS = {
   saveProduct: "saveProduct",
   getProduct: "getProduct",
   error: "error",
@@ -9,13 +9,13 @@ export const SAVE_PRODUCT_ACTIONS = {
   imageNotFound: "imageNotFound",
 };
 
-export function saveProductReducer(state, action) {
-  switch (action.type) {
+export function saveProductReducer(state, { type, payload }) {
+  switch (type) {
     case SAVE_PRODUCT_ACTIONS.saveProduct:
       return {
         ...state,
-        formValues: action.formValues,
-        savedImages: action.savedImages,
+        formValues: payload.formValues,
+        savedImages: payload.savedImages,
         activeModalText: "Product data successfully saved.",
         isLoading: false,
       };
@@ -24,36 +24,36 @@ export function saveProductReducer(state, action) {
     case SAVE_PRODUCT_ACTIONS.getProduct:
       return {
         ...state,
-        formValues: action.formValues,
-        savedImages: action.savedImages,
+        formValues: payload.formValues,
+        savedImages: payload.savedImages,
         isLoading: false,
       };
     case SAVE_PRODUCT_ACTIONS.deleteImage:
       return {
         ...state,
         activeModalText: "Image successfully deleted.",
-        savedImages: { ...state.savedImages, [action.deletedImage]: null },
+        savedImages: { ...state.savedImages, [payload.deletedImage]: null },
         isLoading: false,
       };
     case SAVE_PRODUCT_ACTIONS.imageNotFound:
       return {
         ...state,
         activeModalText: "Image not found.",
-        savedImages: { ...state.savedImages, [action.notFoundImage]: null },
+        savedImages: { ...state.savedImages, [payload.notFoundImage]: null },
         isLoading: false,
       };
     case SAVE_PRODUCT_ACTIONS.error:
       return {
         ...state,
-        errorsList: action.errorsList,
-        formValues: action.formValues,
+        errorsList: payload.errorsList,
+        formValues: payload.formValues,
       };
     case GLOBAL_ACTIONS.closeErrorModal:
       return { ...state, errorsList: null };
     case GLOBAL_ACTIONS.closeModal:
       return { ...state, activeModalText: null };
     case GLOBAL_ACTIONS.loader:
-      return { ...state, isLoading: action.isLoading };
+      return { ...state, isLoading: payload.isLoading };
     case GLOBAL_ACTIONS.unauthorized:
       return { ...state, isUnauthorized: true };
     case GLOBAL_ACTIONS.serverError:
@@ -66,43 +66,41 @@ export function saveProductReducer(state, action) {
 export const getProductActionCreator = (formValues, savedImages) => {
   return {
     type: SAVE_PRODUCT_ACTIONS.getProduct,
-    formValues,
-    savedImages,
+    payload: { formValues, savedImages },
   };
 };
 
 export const saveProductActionCreator = (formValues, savedImages) => {
   return {
     type: SAVE_PRODUCT_ACTIONS.saveProduct,
-    formValues,
-    savedImages,
+    payload: { formValues, savedImages },
   };
 };
 
 export const productNotFoundActionCreator = () => {
   return {
     type: SAVE_PRODUCT_ACTIONS.productNotFound,
+    payload: null,
   };
 };
 
 export const saveProductErrorActionCreator = (errorsList, formValues) => {
   return {
     type: SAVE_PRODUCT_ACTIONS.error,
-    errorsList,
-    formValues,
+    payload: { errorsList, formValues },
   };
 };
 
 export const deleteImageActionCreator = (deletedImage) => {
   return {
     type: SAVE_PRODUCT_ACTIONS.deleteImage,
-    deletedImage,
+    payload: { deletedImage },
   };
 };
 
 export const imageNotFoundActionCreator = (notFoundImage) => {
   return {
     type: SAVE_PRODUCT_ACTIONS.imageNotFound,
-    notFoundImage,
+    payload: { notFoundImage },
   };
 };

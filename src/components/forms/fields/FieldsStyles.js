@@ -14,10 +14,6 @@ export const StyledStandardFieldContainer = styled.div`
   input[type="checkbox"] {
     order: -1;
   }
-  input[type="color"] {
-    padding: unset;
-    border-radius: unset;
-  }
 `;
 
 export const StyledFileUploadBtn = styled(StyledButton)`
@@ -31,6 +27,9 @@ export const StyledTextAreaContainer = styled.div`
   display: flex;
   flex-direction: column;
   margin: 10px 0 20px 0;
+  label {
+    margin-bottom: 10px;
+  }
   textarea {
     resize: none;
     border-radius: 10px;

@@ -5,7 +5,9 @@ export const StyledLoginPageForm = styled.form`
   margin: auto;
   display: flex;
   flex-direction: column;
-  background-color: ${({ theme: { secondaryColor } }) => secondaryColor};
+  background-color: ${({ theme: { secondaryBackgroundColor } }) =>
+    secondaryBackgroundColor};
+  color: ${({ theme: { secondaryTextColor } }) => secondaryTextColor};
   border-radius: 10px;
   padding: 1.5rem 1.5rem;
   max-width: 300px;

@@ -16,11 +16,22 @@ describe("gestSettings (GET)", () => {
       status: 200,
       json: () =>
         Promise.resolve({
-          tertiaryColor: "#112233",
-          secondaryColor: "#223344",
-          leadingColor: "#334455",
+          theme: {
+            id: 1,
+            name: "Green, grey and white",
+            secondaryBackgroundColor: "#f1f1f1",
+            secondaryTextColor: "#000000",
+            leadingBackgroundColor: "#02d463",
+            leadingTextColor: "#000000",
+            navbarBackgroundColor: "#ffffff",
+            navbarTextColor: "#000000",
+            mainBackgroundColor: "#ffffff",
+            mainTextColor: "#000000",
+            footerBackgroundColor: "#ffffff",
+            footerTextColor: "#000000",
+          },
           logo: "logo.png",
-          currency: "PLN",
+          currency: "1",
           regulations: "regulations.pdf",
         }),
     });
@@ -36,11 +47,22 @@ describe("gestSettings (GET)", () => {
                   data-testid="setDataBtn"
                   onClick={() =>
                     setShopSettings({
-                      tertiaryColor: "#998877",
-                      secondaryColor: "#887766",
-                      leadingColor: "#776655",
+                      theme: {
+                        id: 2,
+                        name: "theme2",
+                        secondaryBackgroundColor: "#f1f1f1",
+                        secondaryTextColor: "#000000",
+                        leadingBackgroundColor: "#02d463",
+                        leadingTextColor: "#000000",
+                        navbarBackgroundColor: "#ffffff",
+                        navbarTextColor: "#333333",
+                        mainBackgroundColor: "#ffffff",
+                        mainTextColor: "#000000",
+                        footerBackgroundColor: "#ffffff",
+                        footerTextColor: "#000000",
+                      },
                       logo: "logo2.png",
-                      currency: "EUR",
+                      currency: "2",
                       regulations: "regulations2.pdf",
                     })
                   }
@@ -70,12 +92,23 @@ describe("gestSettings (GET)", () => {
 
   test("add fetched data to context", async () => {
     expect(valueChecker.mock.calls).toHaveLength(1);
-    expect(valueChecker.mock.calls[0][0]).toEqual({
-      tertiaryColor: "#112233",
-      secondaryColor: "#223344",
-      leadingColor: "#334455",
+    expect(valueChecker.mock.calls[0][0]).toStrictEqual({
+      theme: {
+        id: 1,
+        name: "Green, grey and white",
+        secondaryBackgroundColor: "#f1f1f1",
+        secondaryTextColor: "#000000",
+        leadingBackgroundColor: "#02d463",
+        leadingTextColor: "#000000",
+        navbarBackgroundColor: "#ffffff",
+        navbarTextColor: "#000000",
+        mainBackgroundColor: "#ffffff",
+        mainTextColor: "#000000",
+        footerBackgroundColor: "#ffffff",
+        footerTextColor: "#000000",
+      },
       logo: "logo.png",
-      currency: "PLN",
+      currency: "1",
       regulations: "regulations.pdf",
     });
   });
@@ -85,12 +118,23 @@ describe("gestSettings (GET)", () => {
     userEvent.click(setDataBtn);
     await waitFor(() => expect(setDataBtn).toBeInTheDocument());
     expect(valueChecker.mock.calls).toHaveLength(2);
-    expect(valueChecker.mock.calls[1][0]).toEqual({
-      tertiaryColor: "#998877",
-      secondaryColor: "#887766",
-      leadingColor: "#776655",
+    expect(valueChecker.mock.calls[1][0]).toStrictEqual({
+      theme: {
+        id: 2,
+        name: "theme2",
+        secondaryBackgroundColor: "#f1f1f1",
+        secondaryTextColor: "#000000",
+        leadingBackgroundColor: "#02d463",
+        leadingTextColor: "#000000",
+        navbarBackgroundColor: "#ffffff",
+        navbarTextColor: "#333333",
+        mainBackgroundColor: "#ffffff",
+        mainTextColor: "#000000",
+        footerBackgroundColor: "#ffffff",
+        footerTextColor: "#000000",
+      },
       logo: "logo2.png",
-      currency: "EUR",
+      currency: "2",
       regulations: "regulations2.pdf",
     });
   });

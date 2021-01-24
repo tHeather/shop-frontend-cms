@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { background } from "../../../components/StyledComponents/Background";
 import {
   StyledBackToListButton,
   StyledButton,
@@ -40,7 +39,6 @@ export const StyledProductListContainer = styled.div`
 `;
 
 export const StyledProductListFiltersContainer = styled.aside`
-  ${background}
   grid-area: filters;
   border-radius: 10px;
   padding: 5px;
@@ -82,7 +80,6 @@ export const StyledProductListPaginationContainer = styled.div`
 `;
 
 export const StyledProductListProductContainer = styled.article`
-  ${background}
   &:hover {
     box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.25);
   }
