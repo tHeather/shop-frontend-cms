@@ -4,6 +4,21 @@ import { settings } from "../../settings";
 import { JsonFetch } from "../fetches/Fetches";
 import Loader from "../loader/Loader";
 
+export const DEFAULT_THEME = {
+  id: 1,
+  name: "Green, grey and white",
+  secondaryBackgroundColor: "#f1f1f1",
+  secondaryTextColor: "#000000",
+  leadingBackgroundColor: "#02d463",
+  leadingTextColor: "#000000",
+  navbarBackgroundColor: "#ffffff",
+  navbarTextColor: "#000000",
+  mainBackgroundColor: "#ffffff",
+  mainTextColor: "#000000",
+  footerBackgroundColor: "#ffffff",
+  footerTextColor: "#000000",
+};
+
 const getSettings = async (setShopSettings, history, setIsLoading) => {
   setIsLoading(true);
   try {
@@ -37,20 +52,7 @@ export const ShopSettingsContext = createContext();
 export default function ShopSettingsProvider({ children }) {
   const history = useHistory();
   const [shopSettings, setShopSettings] = useState({
-    theme: {
-      id: 1,
-      name: "Green, grey and white",
-      secondaryBackgroundColor: "#f1f1f1",
-      secondaryTextColor: "#000000",
-      leadingBackgroundColor: "#02d463",
-      leadingTextColor: "#000000",
-      navbarBackgroundColor: "#ffffff",
-      navbarTextColor: "#000000",
-      mainBackgroundColor: "#ffffff",
-      mainTextColor: "#000000",
-      footerBackgroundColor: "#ffffff",
-      footerTextColor: "#000000",
-    },
+    theme: DEFAULT_THEME,
     logo: "",
     currency: "",
     regulations: "",

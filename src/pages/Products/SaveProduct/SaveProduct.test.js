@@ -1,16 +1,25 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  waitFor,
+  waitForElementToBeRemoved,
+  within,
+} from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Route } from "react-router";
 import SaveProduct from "./SaveProduct";
 import { JsonFetch, FormDataFetch } from "../../../components/fetches/Fetches";
 import { settings } from "../../../settings";
+import { ThemeProvider } from "styled-components";
+import { DEFAULT_THEME } from "../../../components/shopSettingsContext/shopSettingsContext";
 
 const file1 = new File(["test1"], "test1.png", { type: "image/png" });
 const file2 = new File(["test2"], "test2.png", { type: "image/png" });
 const file3 = new File(["test3"], "test3.png", { type: "image/png" });
 
-const FillForm = () => {
+const FillForm = async () => {
   userEvent.type(
     screen.getByLabelText("Product name", { selector: "input" }),
     "Mackbook"
@@ -36,20 +45,26 @@ const FillForm = () => {
     screen.getByLabelText("Discount price", { selector: "input" }),
     "1"
   );
+
   userEvent.upload(
     screen.getByLabelText("First image of product, which is also thumbnail.", {
       selector: "input",
     }),
     file1
   );
+  await waitForElementToBeRemoved(screen.getByText("Loading..."));
+
   userEvent.upload(
     screen.getByLabelText("Second image of product.", { selector: "input" }),
     file2
   );
+  await waitForElementToBeRemoved(screen.getByText("Loading..."));
+
   userEvent.upload(
     screen.getByLabelText("Third image of product.", { selector: "input" }),
     file3
   );
+  await waitForElementToBeRemoved(screen.getByText("Loading..."));
 };
 
 jest.mock("../../../components/fetches/Fetches");
@@ -58,17 +73,19 @@ describe("Save product", () => {
   beforeEach(() => {
     act(() => {
       render(
-        <MemoryRouter initialEntries={["/admin/add-product"]}>
-          <Route exact path="/admin/add-product">
-            <SaveProduct />
-          </Route>
-          <Route exact path="/500">
-            <div>Server error</div>
-          </Route>
-          <Route exact path="/">
-            <div>Login page</div>
-          </Route>
-        </MemoryRouter>
+        <ThemeProvider theme={DEFAULT_THEME}>
+          <MemoryRouter initialEntries={["/admin/add-product"]}>
+            <Route exact path="/admin/add-product">
+              <SaveProduct />
+            </Route>
+            <Route exact path="/500">
+              <div>Server error</div>
+            </Route>
+            <Route exact path="/">
+              <div>Login page</div>
+            </Route>
+          </MemoryRouter>
+        </ThemeProvider>
       );
     });
   });
@@ -96,8 +113,16 @@ describe("Save product", () => {
     ["secondImage", "file", "Second image of product.", "input"],
     ["thirdImage", "file", "Third image of product.", "input"],
   ])("render %s field in form", (name, type, label, selector) => {
-    test(`render ${name} field`, () => {
+    test(`render ${name} field`, async () => {
       const form = screen.getByTestId("saveProductForm");
+
+      if (label === "Discount price") {
+        userEvent.click(
+          within(form).getByLabelText("Is on discount", { selector })
+        );
+        await waitFor(() => screen.getByLabelText(label, { selector }));
+      }
+
       const field = within(form).getByLabelText(label, { selector });
       expect(field.getAttribute("name")).toBe(name);
       if (selector === "textarea") return;
@@ -110,13 +135,13 @@ describe("Save product", () => {
       status: 201,
     });
 
-    FillForm();
+    await FillForm();
 
     userEvent.click(screen.getByText("Save"));
 
     await waitFor(async () =>
       expect(
-        await screen.findByText("Product data successfully saved.")
+        screen.getByText("Product data successfully saved.")
       ).toBeInTheDocument()
     );
 
@@ -145,13 +170,13 @@ describe("Save product", () => {
       status: 201,
     });
 
-    FillForm();
+    await FillForm();
 
     userEvent.click(screen.getByText("Save"));
 
     await waitFor(async () =>
       expect(
-        await screen.findByText("Product data successfully saved.")
+        screen.getByText("Product data successfully saved.")
       ).toBeInTheDocument()
     );
 
@@ -166,7 +191,6 @@ describe("Save product", () => {
       price: null,
       description: "",
       isOnDiscount: false,
-      discountPrice: null,
       firstImage: "",
       secondImage: "",
       thirdImage: "",
@@ -179,11 +203,13 @@ describe("Save product", () => {
       json: () => Promise.resolve({ errors: ["status 400"] }),
     });
 
-    FillForm();
+    await FillForm();
 
     userEvent.click(screen.getByText("Save"));
 
-    expect(await screen.findByText("status 400")).toBeInTheDocument();
+    await waitFor(async () =>
+      expect(screen.getByText("status 400")).toBeInTheDocument()
+    );
 
     userEvent.click(screen.getByTestId("closeErrorBtn"));
 
@@ -208,7 +234,7 @@ describe("Save product", () => {
       status: 401,
     });
 
-    FillForm();
+    await FillForm();
 
     userEvent.click(screen.getByText("Save"));
 
@@ -221,7 +247,7 @@ describe("Save product", () => {
       status: 403,
     });
 
-    FillForm();
+    await FillForm();
 
     userEvent.click(screen.getByText("Save"));
 
@@ -234,7 +260,7 @@ describe("Save product", () => {
       status: 500,
     });
 
-    FillForm();
+    await FillForm();
 
     userEvent.click(screen.getByText("Save"));
 
@@ -263,21 +289,15 @@ describe("Get product", () => {
           thirdImage: "thirdImage.png",
         }),
     });
+
     act(() => {
       render(
-        <MemoryRouter initialEntries={["/admin/add-product"]}>
-          <Route exact path="/admin/add-product">
-            <SaveProduct productId="123" />
-          </Route>
-          <Route exact path="/500">
-            <div>Server error</div>
-          </Route>
-          <Route exact path="/">
-            <div>Login page</div>
-          </Route>
-        </MemoryRouter>
+        <ThemeProvider theme={DEFAULT_THEME}>
+          <SaveProduct productId="123" />
+        </ThemeProvider>
       );
     });
+
     await waitFor(() =>
       expect(screen.queryByTestId("saveProductForm")).toBeInTheDocument()
     );
@@ -311,17 +331,9 @@ describe("Get product", () => {
     });
     act(() => {
       render(
-        <MemoryRouter initialEntries={["/admin/add-product"]}>
-          <Route exact path="/admin/add-product">
-            <SaveProduct productId="123" />
-          </Route>
-          <Route exact path="/500">
-            <div>Server error</div>
-          </Route>
-          <Route exact path="/">
-            <div>Login page</div>
-          </Route>
-        </MemoryRouter>
+        <ThemeProvider theme={DEFAULT_THEME}>
+          <SaveProduct productId="123" />
+        </ThemeProvider>
       );
     });
 
@@ -348,27 +360,18 @@ describe("Get product", () => {
     });
     act(() => {
       render(
-        <MemoryRouter initialEntries={["/admin/add-product"]}>
-          <Route exact path="/admin/products">
-            <div>Product list</div>
-          </Route>
-          <Route exact path="/admin/add-product">
-            <SaveProduct
-              productId="123"
-              setSelectedProductId={mockedSetSelectedProductId}
-            />
-          </Route>
-          <Route exact path="/500">
-            <div>Server error</div>
-          </Route>
-          <Route exact path="/">
-            <div>Login page</div>
-          </Route>
-        </MemoryRouter>
+        <ThemeProvider theme={DEFAULT_THEME}>
+          <SaveProduct
+            productId="123"
+            setSelectedProductId={mockedSetSelectedProductId}
+          />
+        </ThemeProvider>
       );
     });
-    expect(await screen.findByText("Product not found.")).toBeInTheDocument();
-    userEvent.click(screen.getByText("Back to list"));
+    await waitFor(() =>
+      expect(screen.getByTestId("loader")).toBeInTheDocument()
+    );
+
     expect(mockedSetSelectedProductId.mock.calls).toHaveLength(1);
     expect(mockedSetSelectedProductId.mock.calls[0][0]).toBe(null);
   });
@@ -380,15 +383,14 @@ describe("Get product", () => {
     act(() => {
       render(
         <MemoryRouter initialEntries={["/admin/add-product"]}>
-          <Route exact path="/admin/add-product">
-            <SaveProduct productId="123" />
-          </Route>
-          <Route exact path="/500">
-            <div>Server error</div>
-          </Route>
-          <Route exact path="/">
-            <div>Login page</div>
-          </Route>
+          <ThemeProvider theme={DEFAULT_THEME}>
+            <Route exact path="/admin/add-product">
+              <SaveProduct productId="123" />
+            </Route>
+            <Route exact path="/500">
+              <div>Server error</div>
+            </Route>
+          </ThemeProvider>
         </MemoryRouter>
       );
     });
@@ -421,21 +423,23 @@ describe("Update product", () => {
     act(() => {
       render(
         <MemoryRouter initialEntries={["/admin/add-product"]}>
-          <Route exact path="/admin/add-product">
-            <SaveProduct
-              productId="123"
-              setSelectedProductId={mockedSetSelectedProductId}
-            />
-          </Route>
-          <Route exact path="/admin/products">
-            <div>Product list</div>
-          </Route>
-          <Route exact path="/500">
-            <div>Server error</div>
-          </Route>
-          <Route exact path="/">
-            <div>Login page</div>
-          </Route>
+          <ThemeProvider theme={DEFAULT_THEME}>
+            <Route exact path="/admin/add-product">
+              <SaveProduct
+                productId="123"
+                setSelectedProductId={mockedSetSelectedProductId}
+              />
+            </Route>
+            <Route exact path="/admin/products">
+              <div>Product list</div>
+            </Route>
+            <Route exact path="/500">
+              <div>Server error</div>
+            </Route>
+            <Route exact path="/">
+              <div>Login page</div>
+            </Route>
+          </ThemeProvider>
         </MemoryRouter>
       );
     });
@@ -552,8 +556,9 @@ describe("Update product", () => {
     });
 
     userEvent.click(screen.getByText("Save"));
-    expect(await screen.findByText("Product not found.")).toBeInTheDocument();
-    userEvent.click(screen.getByText("Back to list"));
+    await waitFor(() =>
+      expect(screen.getByTestId("loader")).toBeInTheDocument()
+    );
     expect(mockedSetSelectedProductId.mock.calls).toHaveLength(1);
     expect(mockedSetSelectedProductId.mock.calls[0][0]).toBe(null);
   });
@@ -621,7 +626,6 @@ describe("Update product", () => {
 });
 
 describe("delete image", () => {
-  const mockedSetSelectedProductId = jest.fn();
   beforeEach(async () => {
     JsonFetch.mockReturnValueOnce({
       status: 200,
@@ -644,21 +648,20 @@ describe("delete image", () => {
     act(() => {
       render(
         <MemoryRouter initialEntries={["/admin/add-product"]}>
-          <Route exact path="/admin/add-product">
-            <SaveProduct
-              productId="123"
-              setSelectedProductId={mockedSetSelectedProductId}
-            />
-          </Route>
-          <Route exact path="/admin/products">
-            <div>Product list</div>
-          </Route>
-          <Route exact path="/500">
-            <div>Server error</div>
-          </Route>
-          <Route exact path="/">
-            <div>Login page</div>
-          </Route>
+          <ThemeProvider theme={DEFAULT_THEME}>
+            <Route exact path="/admin/add-product">
+              <SaveProduct productId="123" />
+            </Route>
+            <Route exact path="/admin/products">
+              <div>Product list</div>
+            </Route>
+            <Route exact path="/500">
+              <div>Server error</div>
+            </Route>
+            <Route exact path="/">
+              <div>Login page</div>
+            </Route>
+          </ThemeProvider>
         </MemoryRouter>
       );
     });
@@ -672,7 +675,7 @@ describe("delete image", () => {
       status: 204,
     });
 
-    userEvent.click(screen.getByTestId("deleteFirstImageBtn"));
+    userEvent.click(screen.getAllByRole("button", { name: "Delete" })[0]);
 
     expect(
       await screen.findByText("Image successfully deleted.")
@@ -704,7 +707,7 @@ describe("delete image", () => {
       `${settings.backendApiUrl}/thirdImage.png`
     );
 
-    userEvent.click(screen.getByTestId("deleteFirstImageBtn"));
+    userEvent.click(screen.getAllByRole("button", { name: "Delete" })[0]);
 
     expect(
       await screen.findByText("Image successfully deleted.")
@@ -742,7 +745,7 @@ describe("delete image", () => {
       `${settings.backendApiUrl}/thirdImage.png`
     );
 
-    userEvent.click(screen.getByTestId("deleteFirstImageBtn"));
+    userEvent.click(screen.getAllByRole("button", { name: "Delete" })[0]);
 
     expect(await screen.findByText("Image not found.")).toBeInTheDocument();
 
@@ -766,7 +769,7 @@ describe("delete image", () => {
       status: 401,
     });
 
-    userEvent.click(screen.getByTestId("deleteFirstImageBtn"));
+    userEvent.click(screen.getAllByRole("button", { name: "Delete" })[0]);
 
     expect(await screen.findByText("Login page")).toBeInTheDocument();
     expect(screen.queryByTestId("saveProductForm")).not.toBeInTheDocument();
@@ -777,7 +780,7 @@ describe("delete image", () => {
       status: 403,
     });
 
-    userEvent.click(screen.getByTestId("deleteFirstImageBtn"));
+    userEvent.click(screen.getAllByRole("button", { name: "Delete" })[0]);
 
     expect(await screen.findByText("Login page")).toBeInTheDocument();
     expect(screen.queryByTestId("saveProductForm")).not.toBeInTheDocument();
@@ -788,7 +791,7 @@ describe("delete image", () => {
       status: 500,
     });
 
-    userEvent.click(screen.getByTestId("deleteFirstImageBtn"));
+    userEvent.click(screen.getAllByRole("button", { name: "Delete" })[0]);
 
     expect(await screen.findByText("Server error")).toBeInTheDocument();
     expect(screen.queryByTestId("saveProductForm")).not.toBeInTheDocument();

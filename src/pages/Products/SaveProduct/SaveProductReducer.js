@@ -47,6 +47,7 @@ export function saveProductReducer(state, { type, payload }) {
         ...state,
         errorsList: payload.errorsList,
         formValues: payload.formValues,
+        isLoading: false,
       };
     case GLOBAL_ACTIONS.closeErrorModal:
       return { ...state, errorsList: null };
