@@ -24,9 +24,10 @@ import {
   StyledProductListListContainer,
   StyledProductListPaginationContainer,
   StyledProductListContainer,
-  StyledProductListFiltersBtn,
 } from "./ProductListStyles";
 import { productListReducer } from "./ProductListReducer";
+import { SORT_TYPES } from "../../../components/constants/constants";
+import { StyledPageHeadline } from "../../../components/StyledComponents/PageHeadlineStyles";
 
 const getProducts = async (searchParams, dispatch) => {
   dispatch(loaderActionCreator(true));
@@ -109,7 +110,7 @@ const DisplayProductList = ({ products, handleOnClick }) => {
 };
 
 const initialState = {
-  filters: null,
+  filters: { sortType: SORT_TYPES.nameAscending },
   products: null,
   totalPages: 0,
   pageNumber: 1,
@@ -152,29 +153,31 @@ export default function ProductList() {
     );
 
   return (
-    <StyledProductListContainer>
-      <StyledProductListFiltersContainer>
-        <StyledProductListFiltersBtn>Filters</StyledProductListFiltersBtn>
-        <ProductListFilters dispatch={dispatch} />
-      </StyledProductListFiltersContainer>
-      <StyledProductListListContainer>
-        {isLoading ? (
-          <Loader />
-        ) : (
-          <DisplayProductList
-            products={products}
-            handleOnClick={setSelectedProductId}
+    <>
+      <StyledPageHeadline>Product list</StyledPageHeadline>
+      <StyledProductListContainer>
+        <StyledProductListFiltersContainer>
+          <ProductListFilters dispatch={dispatch} />
+        </StyledProductListFiltersContainer>
+        <StyledProductListListContainer>
+          {isLoading ? (
+            <Loader />
+          ) : (
+            <DisplayProductList
+              products={products}
+              handleOnClick={setSelectedProductId}
+            />
+          )}
+        </StyledProductListListContainer>
+        <StyledProductListPaginationContainer>
+          <Pagination
+            handlePageNumberChange={(pageNum) =>
+              dispatch(changePageNumberActionCreator(pageNum))
+            }
+            totalPages={totalPages}
           />
-        )}
-      </StyledProductListListContainer>
-      <StyledProductListPaginationContainer>
-        <Pagination
-          handlePageNumberChange={(pageNum) =>
-            dispatch(changePageNumberActionCreator(pageNum))
-          }
-          totalPages={totalPages}
-        />
-      </StyledProductListPaginationContainer>
-    </StyledProductListContainer>
+        </StyledProductListPaginationContainer>
+      </StyledProductListContainer>
+    </>
   );
 }

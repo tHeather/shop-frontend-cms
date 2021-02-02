@@ -5,6 +5,8 @@ import Navigation from "../Navigation/Navigation";
 import Routing from "../routes/Routing";
 import { ShopSettingsContext } from "../shopSettingsContext/shopSettingsContext";
 
+const NAVBAR_HEIGHT = 50;
+
 const GlobalStyles = createGlobalStyle`
 html{
   font-size: 16px;
@@ -33,8 +35,8 @@ body{
 `;
 
 const StyledMain = styled.main`
-  margin-top: ${({ isLoggedIn }) => (isLoggedIn ? "50px" : 0)};
-  min-height: 100vh;
+  margin-top: ${({ isLoggedIn }) => (isLoggedIn ? `${NAVBAR_HEIGHT}px` : 0)};
+  min-height: calc(100vh - ${NAVBAR_HEIGHT}px);
   background-color: ${({ theme: { mainBackgroundColor } }) =>
     mainBackgroundColor};
   color: ${({ theme: { mainTextColor } }) => mainTextColor};

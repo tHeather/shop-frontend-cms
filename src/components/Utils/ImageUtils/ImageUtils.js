@@ -19,7 +19,7 @@ export const DisplayImage = ({ src, alt = "" }) => {
   const [image, setImage] = useState(null);
 
   if (isString(src) && src.length)
-    return <img src={`${settings.backendApiUrl}/${src}`} alt="" />;
+    return <img src={`${settings.backendApiUrl}/${src}`} alt={alt} />;
 
   if (src instanceof Blob && isImage(src.name)) {
     const reader = new FileReader();

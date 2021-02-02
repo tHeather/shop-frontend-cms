@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik } from "formik";
 import {
   FILTER_TYPE,
@@ -9,7 +9,11 @@ import {
   StandardField,
 } from "../../../../components/forms/fields/Fields";
 import { submitFiltersActionCreator } from "../ProductListReducer";
-import { StyledProductListFiltersForm } from "./ProductListFiltersStyles";
+import {
+  StyledProductListFiltersBtn,
+  StyledProductListFiltersForm,
+  StyledProductListFiltersFormWrapper,
+} from "./ProductListFiltersStyles";
 import { StyledButton } from "../../../../components/StyledComponents/Button";
 
 const initialValues = {
@@ -20,60 +24,72 @@ const initialValues = {
 };
 
 export default function ProductListFilters({ dispatch }) {
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <Formik
-      initialValues={initialValues}
-      onSubmit={(values) => dispatch(submitFiltersActionCreator(values))}
-    >
-      {({ values, submitForm, setValues, setFieldTouched }) => {
-        return (
-          <StyledProductListFiltersForm onBlur={submitForm}>
-            <SelectField
-              name="sortType"
-              label="Sort by:"
-              onChange={({ target: { value } }) => {
-                setValues({ ...values, sortType: value });
-                setFieldTouched("sortType", true, false);
-                submitForm();
-              }}
-              value={values.sortType}
-            >
-              <option value={SORT_TYPES.nameAscending}>Name ascending</option>
-              <option value={SORT_TYPES.nameDescending}>Name descending</option>
-              <option value={SORT_TYPES.quantityAscending}>
-                Quantity ascending
-              </option>
-              <option value={SORT_TYPES.quantityDescending}>
-                Quantity descending
-              </option>
-            </SelectField>
-            <StandardField
-              name={FILTER_TYPE.type}
-              type="text"
-              maxLength="150"
-              label="Type of product"
-            />
-            <StandardField
-              name={FILTER_TYPE.isOnDiscount}
-              label="Is on discount"
-              type="checkbox"
-              onChange={({ target: { value } }) => {
-                setValues({ ...values, [FILTER_TYPE.isOnDiscount]: value });
-                setFieldTouched(FILTER_TYPE.isOnDiscount, true, false);
-                submitForm();
-              }}
-            />
-            <StandardField
-              name="search"
-              type="text"
-              maxLength="150"
-              placeholder="Search for a product..."
-              label="Search"
-            />
-            <StyledButton type="submit">Search</StyledButton>
-          </StyledProductListFiltersForm>
-        );
-      }}
-    </Formik>
+    <>
+      <StyledProductListFiltersBtn onClick={() => setIsOpen((s) => !s)}>
+        Filters
+      </StyledProductListFiltersBtn>
+      <Formik
+        initialValues={initialValues}
+        onSubmit={(values) => dispatch(submitFiltersActionCreator(values))}
+      >
+        {({ values, submitForm, setValues, setFieldTouched }) => {
+          return (
+            <StyledProductListFiltersFormWrapper isOpen={isOpen}>
+              <StyledProductListFiltersForm onBlur={submitForm}>
+                <SelectField
+                  name="sortType"
+                  label="Sort by:"
+                  onChange={({ target: { value } }) => {
+                    setValues({ ...values, sortType: value });
+                    setFieldTouched("sortType", true, false);
+                    submitForm();
+                  }}
+                  value={values.sortType}
+                >
+                  <option value={SORT_TYPES.nameAscending}>
+                    Name ascending
+                  </option>
+                  <option value={SORT_TYPES.nameDescending}>
+                    Name descending
+                  </option>
+                  <option value={SORT_TYPES.quantityAscending}>
+                    Quantity ascending
+                  </option>
+                  <option value={SORT_TYPES.quantityDescending}>
+                    Quantity descending
+                  </option>
+                </SelectField>
+                <StandardField
+                  name={FILTER_TYPE.type}
+                  type="text"
+                  maxLength="150"
+                  label="Type of product"
+                />
+                <StandardField
+                  name={FILTER_TYPE.isOnDiscount}
+                  label="Is on discount"
+                  type="checkbox"
+                  onChange={({ target: { value } }) => {
+                    setValues({ ...values, [FILTER_TYPE.isOnDiscount]: value });
+                    setFieldTouched(FILTER_TYPE.isOnDiscount, true, false);
+                    submitForm();
+                  }}
+                />
+                <StandardField
+                  name="search"
+                  type="text"
+                  maxLength="150"
+                  placeholder="Search for a product..."
+                  label="Search"
+                />
+                <StyledButton type="submit">Search</StyledButton>
+              </StyledProductListFiltersForm>
+            </StyledProductListFiltersFormWrapper>
+          );
+        }}
+      </Formik>
+    </>
   );
 }
