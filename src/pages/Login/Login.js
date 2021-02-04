@@ -3,6 +3,7 @@ import { useHistory } from "react-router";
 import { AuthContext } from "../../components/auth/AuthContext";
 import { HandleErrorMessage } from "../../components/Errors/ErrorHandlers";
 import ErrorModal from "../../components/Errors/ErrorModal";
+import { StyledErrorMessage } from "../../components/Errors/ErrorStyles";
 import { JsonFetch } from "../../components/fetches/Fetches";
 import Loader, { LOADER_SIZES } from "../../components/loader/Loader";
 import { StyledButton } from "../../components/StyledComponents/Button";
@@ -93,7 +94,11 @@ export default function Login() {
             onChange={({ target: { value } }) => setPassword(value)}
             defaultValue={password}
           />
-          {!isFormValidated && "E-mail and password are required."}
+          {!isFormValidated && (
+            <StyledErrorMessage>
+              E-mail and password are required.
+            </StyledErrorMessage>
+          )}
           <StyledButton
             onClick={(e) => {
               e.preventDefault();
