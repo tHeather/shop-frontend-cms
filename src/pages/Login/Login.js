@@ -4,7 +4,7 @@ import { AuthContext } from "../../components/auth/AuthContext";
 import { HandleErrorMessage } from "../../components/Errors/ErrorHandlers";
 import ErrorModal from "../../components/Errors/ErrorModal";
 import { JsonFetch } from "../../components/fetches/Fetches";
-import Loader from "../../components/loader/Loader";
+import Loader, { LOADER_SIZES } from "../../components/loader/Loader";
 import { StyledButton } from "../../components/StyledComponents/Button";
 import { StyledInput } from "../../components/StyledComponents/Input";
 import { settings } from "../../settings";
@@ -76,7 +76,7 @@ export default function Login() {
         />
       )}
       {isLoading ? (
-        <Loader />
+        <Loader size={LOADER_SIZES.fullscreen} />
       ) : (
         <StyledLoginPageForm>
           <label htmlFor="email">E-mail</label>

@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer, useState } from "react";
 import { useHistory } from "react-router";
 import { JsonFetch } from "../../../components/fetches/Fetches";
-import Loader from "../../../components/loader/Loader";
+import Loader, { LOADER_SIZES } from "../../../components/loader/Loader";
 import {
   loaderActionCreator,
   serverErrorActionCreator,
@@ -161,7 +161,7 @@ export default function ProductList() {
         </StyledProductListFiltersContainer>
         <StyledProductListListContainer>
           {isLoading ? (
-            <Loader />
+            <Loader size={LOADER_SIZES.list} />
           ) : (
             <DisplayProductList
               products={products}

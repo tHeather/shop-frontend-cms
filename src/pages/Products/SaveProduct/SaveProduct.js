@@ -4,7 +4,7 @@ import {
   StandardField,
   TextArea,
 } from "../../../components/forms/fields/Fields";
-import Loader from "../../../components/loader/Loader";
+import Loader, { LOADER_SIZES } from "../../../components/loader/Loader";
 import { HandleUnauthorizedOrForbiddenError } from "../../../components/Errors/ErrorHandlers";
 import { InfoModal } from "../../../components/Messages/Modal";
 import { useHistory } from "react-router-dom";
@@ -137,7 +137,7 @@ export default function SaveProduct({ productId, setSelectedProductId }) {
     setSelectedProductId(null);
   }, [isProductNotFound]);
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return <Loader size={LOADER_SIZES.fullscreenWithNavbar} />;
 
   return (
     <>

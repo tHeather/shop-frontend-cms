@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { HandleUnauthorizedOrForbiddenError } from "../../../components/Errors/ErrorHandlers";
 import { JsonFetch } from "../../../components/fetches/Fetches";
-import Loader from "../../../components/loader/Loader";
+import Loader, { LOADER_SIZES } from "../../../components/loader/Loader";
 import { Modal } from "../../../components/Messages/Modal";
 import { settings } from "../../../settings";
 import SaveProduct from "../SaveProduct/SaveProduct";
@@ -64,7 +64,7 @@ export default function EditProduct({ productId, setSelectedProductId }) {
       </Modal>
     );
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return <Loader size={LOADER_SIZES.fullscreenWithNavbar} />;
 
   return (
     <StyledEditProductContainer>

@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { settings } from "../../settings";
 import { JsonFetch } from "../fetches/Fetches";
-import Loader from "../loader/Loader";
+import Loader, { LOADER_SIZES } from "../loader/Loader";
 
 export const DEFAULT_THEME = {
   id: 1,
@@ -64,7 +64,8 @@ export default function ShopSettingsProvider({ children }) {
     getSettings(setShopSettings, history, setIsLoading);
   }, []);
 
-  if (isLoading) return <Loader />;
+  if (isLoading)
+    return <Loader theme={shopSettings.theme} size={LOADER_SIZES.fullscreen} />;
 
   return (
     <ShopSettingsContext.Provider value={{ ...shopSettings, setShopSettings }}>
