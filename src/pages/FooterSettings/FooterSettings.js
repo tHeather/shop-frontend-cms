@@ -1,4 +1,4 @@
-import { Form, Formik } from "formik";
+import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { object } from "yup";
@@ -17,7 +17,10 @@ import {
 } from "../../components/forms/fieldsConstraints/FieldsConstraints";
 import Loader from "../../components/loader/Loader";
 import { InfoModal } from "../../components/Messages/Modal";
+import { StyledButton } from "../../components/StyledComponents/Button";
+import { StyledPageHeadline } from "../../components/StyledComponents/PageHeadlineStyles";
 import { settings } from "../../settings";
+import { StyledFooterSettingsForm } from "./FooterSettingsStyles";
 
 const validationSchema = object().shape({
   weekWorkingHours: timeRangeValidation,
@@ -137,6 +140,7 @@ export default function FooterSettings() {
           closeHandler={() => setErrorsList([])}
         />
       )}
+      <StyledPageHeadline>Footer settings</StyledPageHeadline>
       <Formik
         validationSchema={validationSchema}
         initialValues={formValues}
@@ -152,7 +156,7 @@ export default function FooterSettings() {
         }
       >
         {({ isValid }) => (
-          <Form data-testid="footerSettingsForm">
+          <StyledFooterSettingsForm data-testid="footerSettingsForm">
             <StandardField
               name="weekWorkingHours"
               label="Opening hours (Mon - Fri)"
@@ -175,10 +179,10 @@ export default function FooterSettings() {
 
             <TextArea name="text" label="Text" rows="8" />
 
-            <button type="submit" disabled={!isValid}>
+            <StyledButton type="submit" disabled={!isValid}>
               Save
-            </button>
-          </Form>
+            </StyledButton>
+          </StyledFooterSettingsForm>
         )}
       </Formik>
     </>
