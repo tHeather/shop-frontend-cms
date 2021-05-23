@@ -2,61 +2,42 @@ import {
   act,
   render,
   screen,
+  waitFor,
   waitForElementToBeRemoved,
+  within,
 } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import userEvent from "@testing-library/user-event";
-import SaveCategory, {
-  addTypeToCategory,
-  removeTypeFromCategory,
-  SelectType,
-  TypeList,
-} from "./SaveCategory";
+import SaveCategory, { SelectType, TypeList } from "./SaveCategory";
 import { JsonFetch } from "../../../components/fetches/Fetches";
 import { settings } from "../../../settings";
 import { MemoryRouter, Route } from "react-router";
 jest.mock("../../../components/fetches/Fetches");
 
-test("addTypeToCategory", () => {
-  const mockedSetCategoryTypes = jest.fn((fun) => fun(new Set()));
-  const expectResult = new Set().add("Laptop");
-
-  addTypeToCategory("Laptop", mockedSetCategoryTypes);
-
-  expect(mockedSetCategoryTypes.mock.results[0].value).toEqual(expectResult);
-});
-
-test("removeTypeFromCategory", () => {
-  const initSet = new Set().add("Laptop").add("Speaker");
-  const expectResult = new Set().add("Speaker");
-  const mockedSetCategoryTypes = jest.fn((fun) => fun(initSet));
-
-  removeTypeFromCategory("Laptop", mockedSetCategoryTypes);
-
-  expect(mockedSetCategoryTypes.mock.results[0].value).toEqual(expectResult);
-});
-
 describe("SelectType", () => {
   test("render component correctly (with types)", () => {
-    const mockedSetSelectedValue = jest.fn();
+    const mockedDispatch = jest.fn();
     act(() => {
       render(
         <SelectType
           types={["Laptop", "Speaker", "keyboard"]}
-          setSelectedType={mockedSetSelectedValue}
+          mockedDispatch={mockedDispatch}
         />
       );
     });
 
-    expect(screen.getByText("Type")).toBeInTheDocument();
+    expect(screen.getByLabelText("Type")).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Laptop" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Speaker" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "keyboard" })
+    ).toBeInTheDocument();
   });
 
   test("render component correctly (with empty array)", () => {
-    const mockedSetSelectedValue = jest.fn();
+    const mockedDispatch = jest.fn();
     act(() => {
-      render(
-        <SelectType types={[]} setSelectedType={mockedSetSelectedValue} />
-      );
+      render(<SelectType types={[]} mockedDispatch={mockedDispatch} />);
     });
 
     expect(
@@ -67,12 +48,12 @@ describe("SelectType", () => {
   });
 
   test("handle selection of option", () => {
-    const mockedSetSelectedValue = jest.fn();
+    const mockedDispatch = jest.fn();
     act(() => {
       render(
         <SelectType
           types={["Laptop", "Speaker", "keyboard"]}
-          setSelectedType={mockedSetSelectedValue}
+          dispatch={mockedDispatch}
         />
       );
     });
@@ -81,70 +62,59 @@ describe("SelectType", () => {
       screen.getByLabelText("Type", { selector: "select" }),
       "Speaker"
     );
-    expect(mockedSetSelectedValue.mock.calls.length).toBe(1);
-    expect(mockedSetSelectedValue.mock.calls[0][0]).toBe("Speaker");
+    expect(mockedDispatch.mock.calls.length).toBe(1);
+    expect(mockedDispatch.mock.calls[0][0]).toEqual({
+      payload: { selectedType: "Speaker" },
+      type: "setSelectedType",
+    });
   });
 });
 
 describe("TypeList", () => {
   test("render component correctly (with empty set)", () => {
-    const mockedremoveTypeFromCategory = jest.fn();
-    const mockedsetCategoryTypes = jest.fn();
+    const mockedDispatch = jest.fn();
     act(() => {
-      render(
-        <TypeList
-          categoryTypes={new Set()}
-          setCategoryTypes={mockedsetCategoryTypes}
-          removeTypeFromCategory={mockedremoveTypeFromCategory}
-        />
-      );
+      render(<TypeList categoryTypes={new Set()} dispatch={mockedDispatch} />);
     });
 
     expect(screen.getByText("No types here yet.")).toBeInTheDocument();
   });
 
   test("render component correctly (with types)", () => {
-    const mockedremoveTypeFromCategory = jest.fn();
-    const initSet = new Set().add("Laptop").add("Speaker");
-    const mockedsetCategoryTypes = jest.fn();
+    const initSet = new Set(["Laptop", "Speaker"]);
+    const arrayFormSet = Array.from(initSet);
+    const mockedDispatch = jest.fn();
 
     act(() => {
-      render(
-        <TypeList
-          categoryTypes={initSet}
-          setCategoryTypes={mockedsetCategoryTypes}
-          removeTypeFromCategory={mockedremoveTypeFromCategory}
-        />
-      );
+      render(<TypeList categoryTypes={initSet} dispatch={mockedDispatch} />);
     });
 
-    expect(screen.getByText("Laptop")).toBeInTheDocument();
-    expect(screen.getByText("Speaker")).toBeInTheDocument();
+    const listItems = screen.getAllByRole("listitem");
+
+    listItems.forEach((item, index) => {
+      expect(within(item).getByText(arrayFormSet[index])).toBeInTheDocument();
+      expect(
+        within(item).getByRole("button", { name: /delete/i })
+      ).toBeInTheDocument();
+    });
   });
 
   test("handle removing type", async () => {
-    const initSet = new Set().add("Laptop").add("Speaker");
-    const mockedsetCategoryTypes = jest.fn();
-    const mockedremoveTypeFromCategory = jest.fn();
+    const initSet = new Set(["Laptop", "Speaker"]);
+    const mockedDispatch = jest.fn();
 
     act(() => {
-      render(
-        <TypeList
-          categoryTypes={initSet}
-          setCategoryTypes={mockedsetCategoryTypes}
-          removeTypeFromCategory={mockedremoveTypeFromCategory}
-        />
-      );
+      render(<TypeList categoryTypes={initSet} dispatch={mockedDispatch} />);
     });
 
-    const buttons = await screen.findAllByRole("button");
+    const buttons = await screen.findAllByRole("button", { name: /delete/i });
     userEvent.click(buttons[0]);
 
-    expect(mockedremoveTypeFromCategory.mock.calls.length).toBe(1);
-    expect(mockedremoveTypeFromCategory.mock.calls[0][0]).toBe("Laptop");
-    expect(mockedremoveTypeFromCategory.mock.calls[0][1]).toEqual(
-      mockedsetCategoryTypes
-    );
+    expect(mockedDispatch.mock.calls.length).toBe(1);
+    expect(mockedDispatch.mock.calls[0][0]).toEqual({
+      payload: { selectedType: "Laptop" },
+      type: "removeTypeFromCategory",
+    });
   });
 });
 
@@ -223,11 +193,11 @@ describe("saveCategory (POST)", () => {
     });
     userEvent.type(categoryInput, "Computers");
 
-    const beforeAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(beforeAddbuttons[0]);
+    const addbutton = await screen.findByRole("button", { name: /add/i });
+    userEvent.click(addbutton);
 
-    const afterAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(afterAddbuttons[afterAddbuttons.length - 1]);
+    const savebutton = await screen.findByRole("button", { name: /save/i });
+    userEvent.click(savebutton);
     expect(
       await screen.findByText("Category successfully saved.")
     ).toBeInTheDocument();
@@ -244,7 +214,7 @@ describe("saveCategory (POST)", () => {
     });
   });
 
-  test("handle srever response (POST,204)", async () => {
+  test("prevent sending duplicate types (POST)", async () => {
     JsonFetch.mockReturnValueOnce({
       status: 204,
     });
@@ -254,11 +224,45 @@ describe("saveCategory (POST)", () => {
     });
     userEvent.type(categoryInput, "Computers");
 
-    const beforeAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(beforeAddbuttons[0]);
+    const addbutton = await screen.findByRole("button", { name: /add/i });
+    userEvent.click(addbutton);
+    userEvent.click(addbutton);
+    userEvent.click(addbutton);
 
-    const afterAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(afterAddbuttons[afterAddbuttons.length - 1]);
+    const savebutton = await screen.findByRole("button", { name: /save/i });
+    userEvent.click(savebutton);
+
+    expect(
+      await screen.findByText("Category successfully saved.")
+    ).toBeInTheDocument();
+
+    expect(JsonFetch.mock.calls.length).toBe(2);
+    expect(JsonFetch.mock.calls[1][0]).toBe(
+      `${settings.backendApiUrl}/api/Category`
+    );
+    expect(JsonFetch.mock.calls[1][1]).toBe("POST");
+    expect(JsonFetch.mock.calls[1][2]).toBe(true);
+    expect(JsonFetch.mock.calls[1][3]).toEqual({
+      title: "Computers",
+      types: ["Laptop"],
+    });
+  });
+
+  test("handle server response (POST,204)", async () => {
+    JsonFetch.mockReturnValueOnce({
+      status: 204,
+    });
+
+    const categoryInput = await screen.findByLabelText("Category name", {
+      selector: "input",
+    });
+    userEvent.type(categoryInput, "Computers");
+
+    const addbutton = await screen.findByRole("button", { name: /add/i });
+    userEvent.click(addbutton);
+
+    const savebutton = await screen.findByRole("button", { name: /save/i });
+    userEvent.click(savebutton);
     expect(
       await screen.findByText("Category successfully saved.")
     ).toBeInTheDocument();
@@ -280,15 +284,18 @@ describe("saveCategory (POST)", () => {
     });
     userEvent.type(categoryInput, "Computers");
 
-    const beforeAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(beforeAddbuttons[0]);
+    const addbutton = await screen.findByRole("button", { name: /add/i });
+    userEvent.click(addbutton);
 
-    const afterAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(afterAddbuttons[afterAddbuttons.length - 1]);
+    const savebutton = await screen.findByRole("button", { name: /save/i });
+    userEvent.click(savebutton);
+
     expect(await screen.findByText("error 400")).toBeInTheDocument();
 
     userEvent.click(screen.getByTestId("closeErrorBtn"));
-    expect(screen.queryByText("error 400")).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText("error 400")).not.toBeInTheDocument();
+    });
   });
 
   test("handle server response (POST, 401)", async () => {
@@ -300,11 +307,12 @@ describe("saveCategory (POST)", () => {
     });
     userEvent.type(categoryInput, "Computers");
 
-    const beforeAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(beforeAddbuttons[0]);
+    const addbutton = await screen.findByRole("button", { name: /add/i });
+    userEvent.click(addbutton);
 
-    const afterAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(afterAddbuttons[afterAddbuttons.length - 1]);
+    const savebutton = await screen.findByRole("button", { name: /save/i });
+    userEvent.click(savebutton);
+
     expect(await screen.findByText("Login page")).toBeInTheDocument();
   });
 
@@ -317,11 +325,12 @@ describe("saveCategory (POST)", () => {
     });
     userEvent.type(categoryInput, "Computers");
 
-    const beforeAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(beforeAddbuttons[0]);
+    const addbutton = await screen.findByRole("button", { name: /add/i });
+    userEvent.click(addbutton);
 
-    const afterAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(afterAddbuttons[afterAddbuttons.length - 1]);
+    const savebutton = await screen.findByRole("button", { name: /save/i });
+    userEvent.click(savebutton);
+
     expect(await screen.findByText("Login page")).toBeInTheDocument();
   });
 
@@ -334,11 +343,12 @@ describe("saveCategory (POST)", () => {
     });
     userEvent.type(categoryInput, "Computers");
 
-    const beforeAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(beforeAddbuttons[0]);
+    const addbutton = await screen.findByRole("button", { name: /add/i });
+    userEvent.click(addbutton);
 
-    const afterAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(afterAddbuttons[afterAddbuttons.length - 1]);
+    const savebutton = await screen.findByRole("button", { name: /save/i });
+    userEvent.click(savebutton);
+
     expect(await screen.findByText("Server error")).toBeInTheDocument();
   });
 });
@@ -446,11 +456,12 @@ describe("updateCategory (PUT)", () => {
     userEvent.clear(categoryInput);
     userEvent.type(categoryInput, "Computers");
 
-    const beforeAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(beforeAddbuttons[0]);
+    const addbutton = await screen.findByRole("button", { name: /add/i });
+    userEvent.click(addbutton);
 
-    const afterAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(afterAddbuttons[afterAddbuttons.length - 1]);
+    const savebutton = await screen.findByRole("button", { name: /save/i });
+    userEvent.click(savebutton);
+
     expect(await screen.findByText("error 400")).toBeInTheDocument();
 
     userEvent.click(screen.getByTestId("closeErrorBtn"));
@@ -467,14 +478,15 @@ describe("updateCategory (PUT)", () => {
     userEvent.clear(categoryInput);
     userEvent.type(categoryInput, "Computers");
 
-    const beforeAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(beforeAddbuttons[0]);
+    const addbutton = await screen.findByRole("button", { name: /add/i });
+    userEvent.click(addbutton);
 
-    const afterAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(afterAddbuttons[afterAddbuttons.length - 1]);
+    const savebutton = await screen.findByRole("button", { name: /save/i });
+    userEvent.click(savebutton);
+
     expect(await screen.findByText("Category not found.")).toBeInTheDocument();
 
-    userEvent.click(screen.getByText("Back to list"));
+    userEvent.click(screen.getByText("OK"));
     expect(mockedSetSelectedCategory.mock.calls).toHaveLength(1);
     expect(mockedSetSelectedCategory.mock.calls[0][0]).toBe(null);
   });
@@ -489,11 +501,12 @@ describe("updateCategory (PUT)", () => {
     userEvent.clear(categoryInput);
     userEvent.type(categoryInput, "Computers");
 
-    const beforeAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(beforeAddbuttons[0]);
+    const addbutton = await screen.findByRole("button", { name: /add/i });
+    userEvent.click(addbutton);
 
-    const afterAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(afterAddbuttons[afterAddbuttons.length - 1]);
+    const savebutton = await screen.findByRole("button", { name: /save/i });
+    userEvent.click(savebutton);
+
     expect(await screen.findByText("Login page")).toBeInTheDocument();
   });
 
@@ -507,11 +520,12 @@ describe("updateCategory (PUT)", () => {
     userEvent.clear(categoryInput);
     userEvent.type(categoryInput, "Computers");
 
-    const beforeAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(beforeAddbuttons[0]);
+    const addbutton = await screen.findByRole("button", { name: /add/i });
+    userEvent.click(addbutton);
 
-    const afterAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(afterAddbuttons[afterAddbuttons.length - 1]);
+    const savebutton = await screen.findByRole("button", { name: /save/i });
+    userEvent.click(savebutton);
+
     expect(await screen.findByText("Login page")).toBeInTheDocument();
   });
 
@@ -525,11 +539,12 @@ describe("updateCategory (PUT)", () => {
     userEvent.clear(categoryInput);
     userEvent.type(categoryInput, "Computers");
 
-    const beforeAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(beforeAddbuttons[0]);
+    const addbutton = await screen.findByRole("button", { name: /add/i });
+    userEvent.click(addbutton);
 
-    const afterAddbuttons = await screen.findAllByRole("button");
-    userEvent.click(afterAddbuttons[afterAddbuttons.length - 1]);
+    const savebutton = await screen.findByRole("button", { name: /save/i });
+    userEvent.click(savebutton);
+
     expect(await screen.findByText("Server error")).toBeInTheDocument();
   });
 });
